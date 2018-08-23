@@ -94,6 +94,14 @@ interface AdapterInterface
     public function setUserId($userId);
 
     /**
+     * Set the domain
+     *
+     * @param  string $domain
+     * @return self
+     */
+    public function setDomain($domain);
+
+    /**
      * Get the username
      *
      * @return string
@@ -106,6 +114,13 @@ interface AdapterInterface
      * @return int
      */
     public function getUserId();
+
+    /**
+     * Get the domain
+     *
+     * @return string
+     */
+    public function getDomain();
 
     /**
      * Get the differences in values between the model states

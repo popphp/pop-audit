@@ -89,6 +89,7 @@ class File extends AbstractAdapter
         $data = [
             'user_id'   => $this->userId,
             'username'  => $this->username,
+            'domain'    => $this->domain,
             'model'     => $this->model,
             'model_id'  => $this->modelId,
             'action'    => $this->action,

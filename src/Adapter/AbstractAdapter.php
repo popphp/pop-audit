@@ -77,6 +77,12 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $userId = null;
 
     /**
+     * Domain
+     * @var string
+     */
+    protected $domain = null;
+
+    /**
      * Set the model name
      *
      * @param  string $model
@@ -175,6 +181,18 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
+     * Set the domain
+     *
+     * @param  string $domain
+     * @return self
+     */
+    public function setDomain($domain)
+    {
+        $this->domain = $domain;
+        return $this;
+    }
+
+    /**
      * Get the username
      *
      * @return string
@@ -192,6 +210,16 @@ abstract class AbstractAdapter implements AdapterInterface
     public function getUserId()
     {
         return $this->userId;
+    }
+
+    /**
+     * Get the domain
+     *
+     * @return string
+     */
+    public function getDomain()
+    {
+        return $this->domain;
     }
 
     /**

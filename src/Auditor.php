@@ -97,6 +97,18 @@ class Auditor
     }
 
     /**
+     * Set domain
+     *
+     * @param  string  $domain
+     * @return Auditor
+     */
+    public function setDomain($domain)
+    {
+        $this->adapter->setDomain($domain);
+        return $this;
+    }
+
+    /**
      * Send the results of the audit
      *
      * @param  array $old
