@@ -58,7 +58,7 @@ class Http extends AbstractAdapter
      * Send the results of the audit
      *
      * @throws Exception
-     * @return void
+     * @return \Pop\Http\Client\Stream
      */
     public function send()
     {
@@ -79,6 +79,8 @@ class Http extends AbstractAdapter
 
         $this->stream->setFields($data);
         $this->stream->send();
+
+        return $this->stream;
     }
 
 }

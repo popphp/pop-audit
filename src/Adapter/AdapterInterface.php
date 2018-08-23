@@ -119,7 +119,7 @@ interface AdapterInterface
     /**
      * Send the results of the audit
      *
-     * @return void
+     * @return mixed
      */
     public function send();
 

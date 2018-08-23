@@ -224,7 +224,7 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Send the results of the audit
      *
-     * @return void
+     * @return mixed
      */
     abstract public function send();
 

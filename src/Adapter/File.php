@@ -59,10 +59,26 @@ class File extends AbstractAdapter
     }
 
     /**
+     * Decode the audit file
+     *
+     * @param  string $filename
+     * @throws Exception
+     * @return array
+     */
+    public function decode($filename)
+    {
+        if (!file_exists($this->folder . DIRECTORY_SEPARATOR . $filename)) {
+            throw new Exception('That audit file does not exist.');
+        }
+
+        return json_decode(file_get_contents($this->folder . DIRECTORY_SEPARATOR . $filename), true);
+    }
+
+    /**
      * Send the results of the audit
      *
      * @throws Exception
-     * @return void
+     * @return string
      */
     public function send()
     {
@@ -81,7 +97,10 @@ class File extends AbstractAdapter
             'timestamp' => date('Y-m-d H:i:s')
         ];
 
-        file_put_contents($this->folder . DIRECTORY_SEPARATOR . 'pop-audit-' . time() . '.log', serialize($data));
+        $filename = 'pop-audit-' . time() . '.log';
+        file_put_contents($this->folder . DIRECTORY_SEPARATOR . $filename, json_encode($data, JSON_PRETTY_PRINT));
+
+        return $filename;
     }
 
 }

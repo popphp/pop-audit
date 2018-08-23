@@ -58,7 +58,7 @@ class Table extends AbstractAdapter
      * Send the results of the audit
      *
      * @throws Exception
-     * @return void
+     * @return \Pop\Db\Record
      */
     public function send()
     {
@@ -70,8 +70,8 @@ class Table extends AbstractAdapter
             'model'     => $this->model,
             'model_id'  => $this->modelId,
             'action'    => $this->action,
-            'old'       => serialize($this->original),
-            'new'       => serialize($this->modified),
+            'old'       => json_encode($this->original),
+            'new'       => json_encode($this->modified),
             'user_id'   => $this->userId,
             'username'  => $this->username,
             'timestamp' => date('Y-m-d H:i:s')
@@ -80,6 +80,8 @@ class Table extends AbstractAdapter
         $className = $this->table;
         $table     = new $className($data);
         $table->save();
+
+        return $table;
     }
 
 }
