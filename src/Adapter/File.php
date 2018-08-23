@@ -87,13 +87,13 @@ class File extends AbstractAdapter
         }
 
         $data = [
+            'user_id'   => $this->userId,
+            'username'  => $this->username,
             'model'     => $this->model,
             'model_id'  => $this->modelId,
             'action'    => $this->action,
             'old'       => $this->original,
             'new'       => $this->modified,
-            'user_id'   => $this->userId,
-            'username'  => $this->username,
             'timestamp' => date('Y-m-d H:i:s')
         ];
 

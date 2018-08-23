@@ -67,13 +67,13 @@ class Http extends AbstractAdapter
         }
 
         $data = [
+            'user_id'   => $this->userId,
+            'username'  => $this->username,
             'model'     => $this->model,
             'model_id'  => $this->modelId,
             'action'    => $this->action,
-            'old'       => serialize($this->original),
-            'new'       => serialize($this->modified),
-            'user_id'   => $this->userId,
-            'username'  => $this->username,
+            'old'       => json_encode($this->original),
+            'new'       => json_encode($this->modified),
             'timestamp' => date('Y-m-d H:i:s')
         ];
 
