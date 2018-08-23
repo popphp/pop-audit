@@ -54,7 +54,8 @@ That file will contain the JSON-encoded data that tracks the difference between 
 model states:
 
 ```json
-{    "user_id": 101,
+{
+    "user_id": 101,
     "username": "testuser",
     "domain": "users.localhost",
     "model": "MyApp\\Model\\User",
