@@ -103,7 +103,7 @@ class Auditor
      * @param  array $new
      * @return mixed
      */
-    public function send(array $old, array $new)
+    public function send(array $old = [], array $new = [])
     {
         $this->adapter->resolveDiff($old, $new);
         return $this->adapter->send();

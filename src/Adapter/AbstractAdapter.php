@@ -30,9 +30,9 @@ abstract class AbstractAdapter implements AdapterInterface
      * Constants for action states
      * @var int
      */
-    const CREATED = 'CREATED';
-    const UPDATED = 'UPDATED';
-    const DELETED = 'DELETED';
+    const CREATED = 'created';
+    const UPDATED = 'updated';
+    const DELETED = 'deleted';
 
     /**
      * Model name
@@ -201,7 +201,7 @@ abstract class AbstractAdapter implements AdapterInterface
      * @param  array $new
      * @return self
      */
-    public function resolveDiff(array $old, array $new)
+    public function resolveDiff(array $old = [], array $new = [])
     {
         if (empty($old) && !empty($new)) {
             $this->modified = $new;
