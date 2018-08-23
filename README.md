@@ -54,20 +54,19 @@ That file will contain the JSON-encoded data that tracks the difference between 
 model states:
 
 ```json
-{
+{    "user_id": 101,
+    "username": "testuser",
+    "domain": "users.localhost",
     "model": "MyApp\\Model\\User",
     "model_id": 1001,
-    "action": "UPDATED",
+    "action": "updated",
     "old": {
         "username": "admin"
     },
     "new": {
         "username": "admin2"
     },
-    "domain": "users.localhost",
-    "user_id": 101,
-    "username": "testuser",
-    "timestamp": "2018-08-23 11:20:30"
+    "timestamp": "2018-08-23 16:56:36"
 }
 ```
 
@@ -108,7 +107,7 @@ $new = [
 $auditor = new Audit\Auditor(new Audit\Adapter\Table('AuditLog'));
 $auditor->setModel('MyApp\Model\User', 1001);
 $auditor->setUser('testuser', 101);
-$auditor->setDomain('users.kettle');
+$auditor->setDomain('users.localhost');
 $row = $auditor->send($old, $new);
 ```
 
