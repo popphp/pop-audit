@@ -250,6 +250,16 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
+     * Check if the model states are different
+     *
+     * @return boolean
+     */
+    public function hasDiff()
+    {
+        return ((null !== $this->action) && ($this->original !== $this->modified));
+    }
+
+    /**
      * Send the results of the audit
      *
      * @return mixed

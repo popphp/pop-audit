@@ -132,6 +132,13 @@ interface AdapterInterface
     public function resolveDiff(array $old, array $new);
 
     /**
+     * Check if the model states are different
+     *
+     * @return boolean
+     */
+    public function hasDiff();
+
+    /**
      * Send the results of the audit
      *
      * @return mixed

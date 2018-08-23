@@ -109,16 +109,42 @@ class Auditor
     }
 
     /**
+     * Get the differences in values between the model states
+     *
+     * @param  array $old
+     * @param  array $new
+     * @return self
+     */
+    public function resolveDiff(array $old = [], array $new = [])
+    {
+        $this->adapter->resolveDiff($old, $new);
+        return $this;
+    }
+
+    /**
+     * Check if the model states are different
+     *
+     * @return boolean
+     */
+    public function hasDiff()
+    {
+        return $this->adapter->hasDiff();
+    }
+
+    /**
      * Send the results of the audit
      *
      * @param  array $old
      * @param  array $new
      * @return mixed
      */
-    public function send(array $old = [], array $new = [])
+    public function send(array $old = null, array $new = null)
     {
-        $this->adapter->resolveDiff($old, $new);
-        return $this->adapter->send();
+        if ((null !== $old) && (null !== $new)) {
+            $this->adapter->resolveDiff($old, $new);
+        }
+
+        return ($this->adapter->hasDiff()) ? $this->adapter->send() : false;
     }
 
 }
