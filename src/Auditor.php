@@ -133,8 +133,22 @@ class Auditor
         return $this;
     }
 
+
     /**
-     * Get the differences in values between the model states
+     * Set the differences in values between the model states (that have already been processed)
+     *
+     * @param  array $old
+     * @param  array $new
+     * @return self
+     */
+    public function setDiff(array $old = [], array $new = [])
+    {
+        $this->adapter->setDiff($old, $new);
+        return $this;
+    }
+
+    /**
+     * Resolve the differences in values between the model states
      *
      * @param  array $old
      * @param  array $new

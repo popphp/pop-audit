@@ -284,7 +284,30 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
-     * Get the differences in values between the model states
+     * Set the differences in values between the model states (that have already been processed)
+     *
+     * @param  array $old
+     * @param  array $new
+     * @return self
+     */
+    public function setDiff(array $old = [], array $new = [])
+    {
+        $this->original = $old;
+        $this->modified = $new;
+
+        if (empty($old) && !empty($new)) {
+            $this->action = self::CREATED;
+        } else if (empty($new) && !empty($old)) {
+            $this->action = self::DELETED;
+        } else {
+            $this->action = self::UPDATED;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Resolve the differences in values between the model states
      *
      * @param  array $old
      * @param  array $new

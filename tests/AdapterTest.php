@@ -87,4 +87,34 @@ class AdapterTest extends TestCase
         $adapter->resolveDiff($old, $new);
         $this->assertEquals('deleted', $adapter->getAction());
     }
+
+    public function testSetDiffCreated()
+    {
+        $old = [];
+        $new = ['username' => 'admin2'];
+
+        $adapter = new Audit\Adapter\File(__DIR__ . '/tmp');
+        $adapter->setDiff($old, $new);
+        $this->assertEquals('created', $adapter->getAction());
+    }
+
+    public function testSetDiffUpdated()
+    {
+        $old = ['username' => 'admin'];
+        $new = ['username' => 'admin2'];
+
+        $adapter = new Audit\Adapter\File(__DIR__ . '/tmp');
+        $adapter->setDiff($old, $new);
+        $this->assertEquals('updated', $adapter->getAction());
+    }
+
+    public function testSetDiffDeleted()
+    {
+        $old = ['username' => 'admin'];
+        $new = [];
+
+        $adapter = new Audit\Adapter\File(__DIR__ . '/tmp');
+        $adapter->setDiff($old, $new);
+        $this->assertEquals('deleted', $adapter->getAction());
+    }
 }

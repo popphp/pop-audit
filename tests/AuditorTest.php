@@ -49,7 +49,18 @@ class AuditorTest extends TestCase
         $this->assertEquals('bar', $auditor->adapter()->getMetadata('foo'));
     }
 
-    public function testDiff()
+    public function testSetDiff()
+    {
+        $old = ['username' => 'admin'];
+        $new = ['username' => 'admin2'];
+
+        $auditor = new Audit\Auditor(new Audit\Adapter\File(__DIR__ . '/tmp'));
+        $auditor->setDiff($old, $new);
+
+        $this->assertTrue($auditor->hasDiff());
+    }
+
+    public function testResolveDiff()
     {
         $old = ['username' => 'admin'];
         $new = ['username' => 'admin2'];
