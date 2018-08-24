@@ -83,6 +83,12 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $domain = null;
 
     /**
+     * Metadata
+     * @var array
+     */
+    protected $metadata = [];
+
+    /**
      * Set the model name
      *
      * @param  string $model
@@ -193,6 +199,31 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
+     * Set the metadata
+     *
+     * @param  array $metadata
+     * @return self
+     */
+    public function setMetadata(array $metadata)
+    {
+        $this->metadata = $metadata;
+        return $this;
+    }
+
+    /**
+     * Add to the metadata
+     *
+     * @param  string $name
+     * @param  mixed $value
+     * @return self
+     */
+    public function addMetadata($name, $value)
+    {
+        $this->metadata[$name] = $value;
+        return $this;
+    }
+
+    /**
      * Get the username
      *
      * @return string
@@ -220,6 +251,36 @@ abstract class AbstractAdapter implements AdapterInterface
     public function getDomain()
     {
         return $this->domain;
+    }
+
+    /**
+     * Determine if there is metadata
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function hasMetadata($name = null)
+    {
+        if (null !== $name) {
+            return isset($this->metadata[$name]);
+        } else {
+            return !empty($this->metadata);
+        }
+    }
+
+    /**
+     * Get the metadata
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function getMetadata($name = null)
+    {
+        if (null !== $name) {
+            return (isset($this->metadata[$name])) ? $this->metadata[$name] : null;
+        } else {
+            return $this->metadata;
+        }
     }
 
     /**

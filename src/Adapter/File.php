@@ -95,6 +95,7 @@ class File extends AbstractAdapter
             'action'    => $this->action,
             'old'       => $this->original,
             'new'       => $this->modified,
+            'metadata'  => $this->metadata,
             'timestamp' => date('Y-m-d H:i:s')
         ];
 

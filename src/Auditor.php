@@ -109,6 +109,31 @@ class Auditor
     }
 
     /**
+     * Set the metadata
+     *
+     * @param  array $metadata
+     * @return Auditor
+     */
+    public function setMetadata(array $metadata)
+    {
+        $this->adapter->setMetadata($metadata);
+        return $this;
+    }
+
+    /**
+     * Add to the metadata
+     *
+     * @param  string $name
+     * @param  mixed $value
+     * @return Auditor
+     */
+    public function addMetadata($name, $value)
+    {
+        $this->adapter->addMetadata($name, $value);
+        return $this;
+    }
+
+    /**
      * Get the differences in values between the model states
      *
      * @param  array $old

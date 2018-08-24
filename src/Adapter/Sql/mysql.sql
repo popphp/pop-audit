@@ -8,6 +8,7 @@ CREATE TABLE `audit_log` (
   `action` varchar(255) NOT NULL,
   `old` longtext DEFAULT NULL,
   `new` longtext DEFAULT NULL,
+  `metadata` longtext DEFAULT NULL,
   `timestamp` datetime NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `user_id` (`user_id`),

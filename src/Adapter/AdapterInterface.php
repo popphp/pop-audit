@@ -102,6 +102,23 @@ interface AdapterInterface
     public function setDomain($domain);
 
     /**
+     * Set the metadata
+     *
+     * @param  array $metadata
+     * @return self
+     */
+    public function setMetadata(array $metadata);
+
+    /**
+     * Add to the metadata
+     *
+     * @param  string $name
+     * @param  mixed $value
+     * @return self
+     */
+    public function addMetadata($name, $value);
+
+    /**
      * Get the username
      *
      * @return string
@@ -121,6 +138,22 @@ interface AdapterInterface
      * @return string
      */
     public function getDomain();
+
+    /**
+     * Determine if there is metadata
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function hasMetadata($name = null);
+
+    /**
+     * Get the metadata
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function getMetadata($name = null);
 
     /**
      * Get the differences in values between the model states

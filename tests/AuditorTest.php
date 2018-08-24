@@ -38,6 +38,17 @@ class AuditorTest extends TestCase
         $this->assertEquals('app.localhost', $auditor->adapter()->getDomain());
     }
 
+    public function testMetadata()
+    {
+        $auditor = new Audit\Auditor(new Audit\Adapter\File(__DIR__ . '/tmp'));
+        $auditor->setMetadata(['foo' => 'bar']);
+        $auditor->addMetadata('baz', 123);
+        $this->assertTrue($auditor->adapter()->hasMetadata());
+        $this->assertTrue($auditor->adapter()->hasMetadata('foo'));
+        $this->assertEquals(2, count($auditor->adapter()->getMetadata()));
+        $this->assertEquals('bar', $auditor->adapter()->getMetadata('foo'));
+    }
+
     public function testDiff()
     {
         $old = ['username' => 'admin'];

@@ -75,6 +75,7 @@ class Table extends AbstractAdapter
             'action'    => $this->action,
             'old'       => json_encode($this->original),
             'new'       => json_encode($this->modified),
+            'metadata'  => json_encode($this->metadata),
             'timestamp' => date('Y-m-d H:i:s')
         ];
 
