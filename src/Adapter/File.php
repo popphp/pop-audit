@@ -90,6 +90,8 @@ class File extends AbstractAdapter
             'user_id'   => $this->userId,
             'username'  => $this->username,
             'domain'    => $this->domain,
+            'route'     => $this->route,
+            'method'    => $this->method,
             'model'     => $this->model,
             'model_id'  => $this->modelId,
             'action'    => $this->action,

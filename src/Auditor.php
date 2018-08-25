@@ -97,14 +97,24 @@ class Auditor
     }
 
     /**
-     * Set domain
+     * Set domain, route and method
      *
      * @param  string  $domain
+     * @param  string  $route
+     * @param  string  $method
      * @return Auditor
      */
-    public function setDomain($domain)
+    public function setDomain($domain = null, $route = null, $method = null)
     {
-        $this->adapter->setDomain($domain);
+        if (null !== $domain) {
+            $this->adapter->setDomain($domain);
+        }
+        if (null !== $route) {
+            $this->adapter->setRoute($route);
+        }
+        if (null !== $method) {
+            $this->adapter->setMethod($method);
+        }
         return $this;
     }
 

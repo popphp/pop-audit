@@ -34,8 +34,10 @@ class AuditorTest extends TestCase
     public function testSetAndGetDomain()
     {
         $auditor = new Audit\Auditor(new Audit\Adapter\File(__DIR__ . '/tmp'));
-        $auditor->setDomain('app.localhost');
+        $auditor->setDomain('app.localhost', '/users/1', 'PUT');
         $this->assertEquals('app.localhost', $auditor->adapter()->getDomain());
+        $this->assertEquals('/users/1', $auditor->adapter()->getRoute());
+        $this->assertEquals('PUT', $auditor->adapter()->getMethod());
     }
 
     public function testMetadata()

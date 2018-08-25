@@ -5,6 +5,8 @@ CREATE TABLE "audit_log" (
   "user_id" integer,
   "username" varchar(255),
   "domain" varchar(255),
+  "route" varchar(255),
+  "method" varchar(255),
   "model" varchar(255) NOT NULL,
   "model_id" integer NOT NULL,
   "action" varchar(255) NOT NULL,

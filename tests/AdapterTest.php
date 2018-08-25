@@ -29,6 +29,20 @@ class AdapterTest extends TestCase
         $this->assertEquals('app.localhost', $adapter->getDomain());
     }
 
+    public function testSetAndGetRoute()
+    {
+        $adapter = new Audit\Adapter\File(__DIR__ . '/tmp');
+        $adapter->setRoute('/users/1');
+        $this->assertEquals('/users/1', $adapter->getRoute());
+    }
+
+    public function testSetAndGetMethod()
+    {
+        $adapter = new Audit\Adapter\File(__DIR__ . '/tmp');
+        $adapter->setMethod('PUT');
+        $this->assertEquals('PUT', $adapter->getMethod());
+    }
+
     public function testSetAndGetModel()
     {
         $adapter = new Audit\Adapter\File(__DIR__ . '/tmp');

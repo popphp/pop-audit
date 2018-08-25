@@ -3,6 +3,8 @@ CREATE TABLE `audit_log` (
   `user_id` int(16) DEFAULT NULL,
   `username` varchar(255) DEFAULT NULL,
   `domain` varchar(255) DEFAULT NULL,
+  `route` varchar(255) DEFAULT NULL,
+  `method` varchar(255) DEFAULT NULL,
   `model` varchar(255) NOT NULL,
   `model_id` int(16) NOT NULL,
   `action` varchar(255) NOT NULL,

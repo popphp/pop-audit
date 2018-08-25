@@ -83,6 +83,18 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $domain = null;
 
     /**
+     * Route
+     * @var string
+     */
+    protected $route = null;
+
+    /**
+     * Method
+     * @var string
+     */
+    protected $method = null;
+
+    /**
      * Metadata
      * @var array
      */
@@ -199,6 +211,30 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
+     * Set the route
+     *
+     * @param  string $route
+     * @return self
+     */
+    public function setRoute($route)
+    {
+        $this->route = $route;
+        return $this;
+    }
+
+    /**
+     * Set the method
+     *
+     * @param  string $method
+     * @return self
+     */
+    public function setMethod($method)
+    {
+        $this->method = $method;
+        return $this;
+    }
+
+    /**
      * Set the metadata
      *
      * @param  array $metadata
@@ -251,6 +287,26 @@ abstract class AbstractAdapter implements AdapterInterface
     public function getDomain()
     {
         return $this->domain;
+    }
+
+    /**
+     * Get the route
+     *
+     * @return string
+     */
+    public function getRoute()
+    {
+        return $this->route;
+    }
+
+    /**
+     * Get the method
+     *
+     * @return string
+     */
+    public function getMethod()
+    {
+        return $this->method;
     }
 
     /**

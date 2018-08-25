@@ -102,6 +102,22 @@ interface AdapterInterface
     public function setDomain($domain);
 
     /**
+     * Set the route
+     *
+     * @param  string $route
+     * @return self
+     */
+    public function setRoute($route);
+
+    /**
+     * Set the method
+     *
+     * @param  string $method
+     * @return self
+     */
+    public function setMethod($method);
+
+    /**
      * Set the metadata
      *
      * @param  array $metadata
@@ -138,6 +154,20 @@ interface AdapterInterface
      * @return string
      */
     public function getDomain();
+
+    /**
+     * Get the route
+     *
+     * @return string
+     */
+    public function getRoute();
+
+    /**
+     * Get the method
+     *
+     * @return string
+     */
+    public function getMethod();
 
     /**
      * Determine if there is metadata
