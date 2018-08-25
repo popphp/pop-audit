@@ -13,6 +13,7 @@ class FileTest extends TestCase
         $adapter = new Adapter\File(__DIR__ . '/../tmp');
         $this->assertInstanceOf('Pop\Audit\Adapter\File', $adapter);
         $this->assertEquals(__DIR__ . '/../tmp', $adapter->getFolder());
+        $this->assertEquals('pop-audit-', $adapter->getPrefix());
     }
 
     public function testConstructorException()
@@ -48,6 +49,9 @@ class FileTest extends TestCase
         $data = $adapter->decode($fileName);
         $this->assertEquals('admin', $data['old']['username']);
         $this->assertEquals('admin2', $data['new']['username']);
+        if (file_exists(__DIR__ . '/../tmp/' . $fileName)) {
+            unlink(__DIR__ . '/../tmp/' . $fileName);
+        }
     }
 
     public function testSendException()

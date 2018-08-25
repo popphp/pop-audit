@@ -32,20 +32,29 @@ class File extends AbstractAdapter
      */
     protected $folder = null;
 
+
+    /**
+     * File prefix
+     * @var string
+     */
+    protected $prefix = 'pop-audit-';
+
     /**
      * Constructor
      *
      * Instantiate the file adapter object
      *
      * @param  string $folder
+     * @param  string $prefix
      * @throws Exception
      */
-    public function __construct($folder)
+    public function __construct($folder, $prefix = 'pop-audit-')
     {
         if (!file_exists($folder)) {
             throw new Exception('That folder does not exist.');
         }
         $this->folder = $folder;
+        $this->prefix = $prefix;
     }
 
     /**
@@ -56,6 +65,16 @@ class File extends AbstractAdapter
     public function getFolder()
     {
         return $this->folder;
+    }
+
+    /**
+     * Get the prefix
+     *
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
     }
 
     /**
@@ -101,7 +120,7 @@ class File extends AbstractAdapter
             'timestamp' => date('Y-m-d H:i:s')
         ];
 
-        $filename = 'pop-audit-' . time() . '.log';
+        $filename = $this->prefix . uniqid() . '-' . time() . '.log';
         file_put_contents($this->folder . DIRECTORY_SEPARATOR . $filename, json_encode($data, JSON_PRETTY_PRINT));
 
         return $filename;
