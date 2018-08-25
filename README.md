@@ -144,3 +144,28 @@ $auditor->setUser('testuser', 101);
 $auditor->setDomain('users.localhost');
 $auditor->send($old, $new);
 ```
+
+### Setting the Diff
+
+The `pop-audit` component can either do the "diffing" for you, or if you have another
+resource that evaluates the differences in values, you can pass those into the auditor as well.
+In the examples above, the auditor object handled the "diffing." If you want to pass
+values that have already been evaluated, you can do that like this:
+
+```php
+use Pop\Audit;
+
+$old = [
+    'username' => 'admin'
+];
+
+$new = [
+    'username' => 'admin2'
+];
+
+$auditor = new Audit\Auditor(new Audit\Adapter\File('tmp'));
+$auditor->setModel('MyApp\Model\User', 1001);
+$auditor->setUser('testuser', 101);
+$auditor->setDomain('users.localhost');
+$auditor->setDiff($old, $new);
+$auditor->send();
