@@ -78,6 +78,20 @@ class File extends AbstractAdapter
     }
 
     /**
+     * Get ID from filename
+     *
+     * @param  string $filename
+     * @throws Exception
+     * @return string
+     */
+    public function getId($filename)
+    {
+        $filename = substr($filename, 0, strrpos($filename, '.'));
+        $filename = substr($filename, 0, strrpos($filename, '-'));
+        return substr($filename, (strrpos($filename, '-') + 1));
+    }
+
+    /**
      * Decode the audit file
      *
      * @param  string $filename
@@ -129,5 +143,139 @@ class File extends AbstractAdapter
 
         return $filename;
     }
+
+    /**
+     * Get model state by ID
+     *
+     * @param  int $id
+     * @return array
+     */
+    public function getStateById($id)
+    {
+        $files   = scandir($this->folder);
+        $results = [];
+
+        foreach ($files as $file) {
+            if (strpos($file, $id) !== false) {
+                $results[$file] = $this->decode($file);
+                break;
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get model state by model
+     *
+     * @param  string $model
+     * @param  int    $modelId
+     * @throws Exception
+     * @return array
+     */
+    public function getStateByModel($model, $modelId = null)
+    {
+        if (null === $modelId) {
+            throw new Exception('You must pass a model ID.');
+        }
+
+        $files   = scandir($this->folder);
+        $id      = md5($model . '-' . $modelId);
+        $results = [];
+
+        foreach ($files as $file) {
+            if (strpos($file, $id) !== false) {
+                $results[$file] = $this->decode($file);
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get model state by timestamp
+     *
+     * @param  string $from
+     * @param  string $backTo
+     * @return array
+     */
+    public function getStateByTimestamp($from, $backTo = null)
+    {
+        $files   = scandir($this->folder);
+        $results = [];
+
+        foreach ($files as $file) {
+            if (($file != '.') && ($file != '..')) {
+                $mtime = filemtime($this->folder . DIRECTORY_SEPARATOR . $file);
+                if (((null !== $backTo) && ($mtime <= $from) && ($mtime >= $backTo)) ||
+                    ((null === $backTo) && ($mtime <= $from))) {
+                    $results[$file] = $this->decode($file);
+                }
+            }
+        }
+
+        return $results;
+    }
+
+
+    /**
+     * Get model state by date
+     *
+     * @param  string $from
+     * @param  string $backTo
+     * @return array
+     */
+    public function getStateByDate($from, $backTo = null)
+    {
+        $results = [];
+
+        if (strpos($from, ' ') === false) {
+            $from .= ' 23:59:59';
+        }
+
+        $from = strtotime($from);
+
+        if (null !== $backTo) {
+            if (strpos($backTo, ' ') === false) {
+                $backTo .= ' 00:00:00';
+            }
+            $backTo = strtotime($backTo);
+        }
+
+        $files = scandir($this->folder);
+        foreach ($files as $file) {
+            if (($file != '.') && ($file != '..')) {
+                $mtime = filemtime($this->folder . DIRECTORY_SEPARATOR . $file);
+                if (((null !== $backTo) && ($mtime <= $from) && ($mtime >= $backTo)) ||
+                    ((null === $backTo) && ($mtime <= $from))) {
+                    $results[$file] = $this->decode($file);
+                }
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get model snapshot by ID
+     *
+     * @param  int     $id
+     * @param  boolean $post
+     * @return array
+     */
+     public function getSnapshot($id, $post = false)
+     {
+         $result   = $this->getStateById($id);
+         $result   = reset($result);
+         $snapshot = [];
+
+         if (!($post) && !empty($result['old'])) {
+             $snapshot = $result['old'];
+         } else if (($post) && !empty($result['new'])) {
+             $snapshot = $result['new'];
+         }
+
+         return $snapshot;
+     }
 
 }

@@ -176,17 +176,17 @@ class Table extends AbstractAdapter
      * Get model snapshot by ID
      *
      * @param  int     $id
-     * @param  boolean $pre
+     * @param  boolean $post
      * @return array
      */
-    public function getSnapshot($id, $pre = true)
+    public function getSnapshot($id, $post = false)
     {
         $result   = call_user_func_array($this->table . '::findById', ['id' => $id]);
         $snapshot = [];
 
-        if (($pre) && !empty($result->old)) {
+        if (!($post) && !empty($result->old)) {
             $snapshot = json_decode($result->old, true);
-        } else if (!($pre) && !empty($result->new)) {
+        } else if (($post) && !empty($result->new)) {
             $snapshot = json_decode($result->new, true);
         }
 

@@ -238,27 +238,27 @@ interface AdapterInterface
      * Get model state by timestamp
      *
      * @param  string $from
-     * @param  string $to
+     * @param  string $backTo
      * @return array
      */
-    public function getStateByTimestamp($from, $to = null);
+    public function getStateByTimestamp($from, $backTo = null);
 
     /**
      * Get model state by date
      *
      * @param  string $from
-     * @param  string $to
+     * @param  string $backTo
      * @return array
      */
-    public function getStateByDate($from, $to = null);
+    public function getStateByDate($from, $backTo = null);
 
     /**
      * Get model snapshot by ID
      *
      * @param  int     $id
-     * @param  boolean $pre
+     * @param  boolean $post
      * @return array
      */
-    public function getSnapshot($id, $pre = true);
+    public function getSnapshot($id, $post = false);
 
 }

@@ -427,26 +427,26 @@ abstract class AbstractAdapter implements AdapterInterface
      * Get model state by timestamp
      *
      * @param  string $from
-     * @param  string $to
+     * @param  string $backTo
      * @return array
      */
-    abstract public function getStateByTimestamp($from, $to = null);
+    abstract public function getStateByTimestamp($from, $backTo = null);
 
     /**
      * Get model state by date
      *
      * @param  string $from
-     * @param  string $to
+     * @param  string $backTo
      * @return array
      */
-    abstract public function getStateByDate($from, $to = null);
+    abstract public function getStateByDate($from, $backTo = null);
 
     /**
      * Get model snapshot by ID
      *
      * @param  int     $id
-     * @param  boolean $pre
+     * @param  boolean $post
      * @return array
      */
-    abstract public function getSnapshot($id, $pre = true);
+    abstract public function getSnapshot($id, $post = false);
 }
