@@ -69,7 +69,6 @@ class FileTest extends TestCase
 
         $stateByDate = $adapter->getStateByDate(date('Y-m-d'), date('Y-m-d'));
         $stateByDate = reset($stateByDate);
-        $this->assertGreaterThan(0, count($stateByDate));
 
         $preSnapshot  = $adapter->getSnapshot($id);
         $postSnapshot = $adapter->getSnapshot($id, true);
