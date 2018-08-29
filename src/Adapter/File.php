@@ -104,6 +104,9 @@ class File extends AbstractAdapter
         if (null === $this->action) {
             throw new Exception('The model state differences have not been resolved.');
         }
+        if ((null === $this->model) || (null === $this->modelId)) {
+            throw new Exception('The model has not been set.');
+        }
 
         $data = [
             'user_id'   => $this->userId,
@@ -120,7 +123,8 @@ class File extends AbstractAdapter
             'timestamp' => date('Y-m-d H:i:s')
         ];
 
-        $filename = $this->prefix . uniqid() . '-' . time() . '.log';
+        $id       = md5($this->model . '-' . $this->modelId) . '-' .uniqid() . '-' . time();
+        $filename = $this->prefix . $id . '.log';
         file_put_contents($this->folder . DIRECTORY_SEPARATOR . $filename, json_encode($data, JSON_PRETTY_PRINT));
 
         return $filename;

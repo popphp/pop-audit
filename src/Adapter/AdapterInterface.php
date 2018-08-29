@@ -217,4 +217,48 @@ interface AdapterInterface
      */
     public function send();
 
+    /**
+     * Get model state by ID
+     *
+     * @param  int $id
+     * @return array
+     */
+    public function getStateById($id);
+
+    /**
+     * Get model state by model
+     *
+     * @param  string $model
+     * @param  int    $modelId
+     * @return array
+     */
+    public function getStateByModel($model, $modelId = null);
+
+    /**
+     * Get model state by timestamp
+     *
+     * @param  string $from
+     * @param  string $to
+     * @return array
+     */
+    public function getStateByTimestamp($from, $to = null);
+
+    /**
+     * Get model state by date
+     *
+     * @param  string $from
+     * @param  string $to
+     * @return array
+     */
+    public function getStateByDate($from, $to = null);
+
+    /**
+     * Get model snapshot by ID
+     *
+     * @param  int     $id
+     * @param  boolean $pre
+     * @return array
+     */
+    public function getSnapshot($id, $pre = true);
+
 }

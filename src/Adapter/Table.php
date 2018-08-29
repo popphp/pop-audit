@@ -65,6 +65,9 @@ class Table extends AbstractAdapter
         if (null === $this->action) {
             throw new Exception('The model state differences have not been resolved.');
         }
+        if ((null === $this->model) || (null === $this->modelId)) {
+            throw new Exception('The model has not been set.');
+        }
 
         $data = [
             'user_id'   => $this->userId,
@@ -86,6 +89,108 @@ class Table extends AbstractAdapter
         $table->save();
 
         return $table;
+    }
+
+    /**
+     * Get model state by ID
+     *
+     * @param  int $id
+     * @return array
+     */
+    public function getStateById($id)
+    {
+        $result = call_user_func_array($this->table . '::findById', ['id' => $id]);
+        $r      = $result->toArray();
+
+        if (!empty($r['old'])) {
+            $r['old'] = json_decode($r['old'], true);
+        }
+        if (!empty($r['new'])) {
+            $r['new'] = json_decode($r['new'], true);
+        }
+
+        return $r;
+    }
+
+    /**
+     * Get model state by model
+     *
+     * @param  string $model
+     * @param  int    $modelId
+     * @param  array  $columns
+     * @return array
+     */
+    public function getStateByModel($model, $modelId = null, array $columns = [])
+    {
+        $columns['model']    = $model;
+        if (null !== $modelId) {
+            $columns['model_id'] = $modelId;
+        }
+        $result = call_user_func_array($this->table . '::findBy', [$columns]);
+        return $result->toArray();
+    }
+
+    /**
+     * Get model state by timestamp
+     *
+     * @param  string $from
+     * @param  string $backTo
+     * @param  array  $columns
+     * @return array
+     */
+    public function getStateByTimestamp($from, $backTo = null, array $columns = [])
+    {
+        $columns['timestamp<='] = date('Y-m-d H:i:s', $from);
+        if (null !== $backTo) {
+            $columns['timestamp>='] = date('Y-m-d H:i:s', $backTo);
+        }
+        $result = call_user_func_array($this->table . '::findBy', [$columns]);
+        return $result->toArray();
+    }
+
+    /**
+     * Get model state by date
+     *
+     * @param  string $from
+     * @param  string $backTo
+     * @param  array  $columns
+     * @return array
+     */
+    public function getStateByDate($from, $backTo = null, array $columns = [])
+    {
+        if (strpos($from, ' ') === false) {
+            $from .= ' 23:59:59';
+        }
+        $columns['timestamp<='] = $from;
+        if (null !== $backTo) {
+            if (strpos($backTo, ' ') === false) {
+                $backTo .= ' 00:00:00';
+            }
+            $columns['timestamp>='] = $backTo;
+        }
+        $result = call_user_func_array($this->table . '::findBy', [$columns]);
+        return $result->toArray();
+    }
+
+    /**
+     * Get model snapshot by ID
+     *
+     * @param  int     $id
+     * @param  boolean $pre
+     * @return array
+     */
+    public function getSnapshot($id, $pre = true)
+    {
+        $result   = call_user_func_array($this->table . '::findById', ['id' => $id]);
+        $snapshot = [];
+
+        if (($pre) && !empty($result->old)) {
+            $snapshot = json_decode($result->old, true);
+        } else if (!($pre) && !empty($result->new)) {
+            $snapshot = json_decode($result->new, true);
+        }
+
+        return $snapshot;
     }
 
 }

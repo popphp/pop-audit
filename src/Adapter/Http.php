@@ -65,6 +65,9 @@ class Http extends AbstractAdapter
         if (null === $this->action) {
             throw new Exception('The model state differences have not been resolved.');
         }
+        if ((null === $this->model) || (null === $this->modelId)) {
+            throw new Exception('The model has not been set.');
+        }
 
         $data = [
             'user_id'   => $this->userId,
