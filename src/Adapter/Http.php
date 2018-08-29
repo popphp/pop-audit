@@ -136,12 +136,12 @@ class Http extends AbstractAdapter
     {
         $fields = [
             'filter' => [
-                'model' => $model
+                'model = ' . $model
             ]
         ];
 
         if (null !== $modelId) {
-            $fields['filter']['model_id'] = $modelId;
+            $fields['filter'][] = 'model_id = ' . $modelId;
         }
 
         $this->fetchStream->setFields($fields);
@@ -159,7 +159,6 @@ class Http extends AbstractAdapter
      */
     public function getStateByTimestamp($from, $backTo = null)
     {
-        $url  = $this->fetchStream->getUrl();
         $from = date('Y-m-d H:i:s', $from);
 
         if (null !== $backTo) {
@@ -176,12 +175,10 @@ class Http extends AbstractAdapter
             $fields['filter'][] = 'timestamp >= ' . $backTo;
         }
 
-        $this->fetchStream->setUrl($url . '?' . http_build_query($fields));
+        $this->fetchStream->setFields($fields);
         $this->fetchStream->send();
 
         $r = json_decode($this->fetchStream->getBody(), true);
-
-        $this->fetchStream->setUrl($url);
 
         return $r;
     }
@@ -195,8 +192,6 @@ class Http extends AbstractAdapter
      */
     public function getStateByDate($from, $backTo = null)
     {
-        $url = $this->fetchStream->getUrl();
-
         if (strpos($from, ' ') === false) {
             $from .= ' 23:59:59';
         }
@@ -217,12 +212,10 @@ class Http extends AbstractAdapter
             $fields['filter'][] = 'timestamp >= ' . $backTo;
         }
 
-        $this->fetchStream->setUrl($url . '?' . http_build_query($fields));
+        $this->fetchStream->setFields($fields);
         $this->fetchStream->send();
 
         $r = json_decode($this->fetchStream->getBody(), true);
-
-        $this->fetchStream->setUrl($url);
 
         return $r;
     }
