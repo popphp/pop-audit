@@ -65,6 +65,16 @@ class Http extends AbstractAdapter
     }
 
     /**
+     * Get the fetch stream
+     *
+     * @return \Pop\Http\Client\Stream
+     */
+    public function getFetchStream()
+    {
+        return $this->fetchStream;
+    }
+
+    /**
      * Send the results of the audit
      *
      * @throws Exception
@@ -94,10 +104,10 @@ class Http extends AbstractAdapter
             'timestamp' => date('Y-m-d H:i:s')
         ];
 
-        $this->stream->setFields($data);
-        $this->stream->send();
+        $this->sendStream->setFields($data);
+        $this->sendStream->send();
 
-        return $this->stream;
+        return $this->sendStream;
     }
 
     /**

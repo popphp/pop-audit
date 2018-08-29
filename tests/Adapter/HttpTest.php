@@ -11,9 +11,10 @@ class HttpTest extends TestCase
 
     public function testConstructor()
     {
-        $adapter = new Adapter\Http(new Stream('http://localhost/'));
+        $adapter = new Adapter\Http(new Stream('http://localhost/'), new Stream('http://localhost/'));
         $this->assertInstanceOf('Pop\Audit\Adapter\Http', $adapter);
-        $this->assertInstanceOf('Pop\Http\Client\Stream', $adapter->getStream());
+        $this->assertInstanceOf('Pop\Http\Client\Stream', $adapter->getSendStream());
+        $this->assertInstanceOf('Pop\Http\Client\Stream', $adapter->getFetchStream());
     }
 
     public function testSend()
@@ -34,6 +35,17 @@ class HttpTest extends TestCase
     {
         $this->expectException('Pop\Audit\Adapter\Exception');
         $adapter = new Adapter\Http(new Stream('http://localhost/'));
+        $adapter->send();
+    }
+
+    public function testSendModelException()
+    {
+        $this->expectException('Pop\Audit\Adapter\Exception');
+        $old = ['username' => 'admin'];
+        $new = ['username' => 'admin2'];
+
+        $adapter = new Adapter\Http(new Stream('http://localhost/'));
+        $adapter->resolveDiff($old, $new);
         $adapter->send();
     }
 

@@ -79,6 +79,7 @@ class AuditorTest extends TestCase
         $new = ['username' => 'admin2'];
 
         $auditor  = new Audit\Auditor(new Audit\Adapter\File(__DIR__ . '/tmp'));
+        $auditor->setModel('MyApp\Model\User', 1001);
         $fileName = $auditor->send($old, $new);
 
         $this->assertFileExists(__DIR__ . '/tmp/' . $fileName);
