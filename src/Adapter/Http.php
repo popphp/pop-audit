@@ -30,28 +30,38 @@ class Http extends AbstractAdapter
      * Stream to send the audit results
      * @var \Pop\Http\Client\Stream
      */
-    protected $stream = null;
+    protected $sendStream = null;
+
+    /**
+     * Stream to fetch the audit results
+     * @var \Pop\Http\Client\Stream
+     */
+    protected $fetchStream = null;
 
     /**
      * Constructor
      *
      * Instantiate the HTTP adapter object
      *
-     * @param  \Pop\Http\Client\Stream $stream
+     * @param  \Pop\Http\Client\Stream $sendStream
+     * @param  \Pop\Http\Client\Stream $fetchStream
      */
-    public function __construct(\Pop\Http\Client\Stream $stream)
+    public function __construct(\Pop\Http\Client\Stream $sendStream, \Pop\Http\Client\Stream $fetchStream = null)
     {
-        $this->stream = $stream;
+        $this->sendStream = $sendStream;
+        if (null !== $fetchStream) {
+            $this->fetchStream = $fetchStream;
+        }
     }
 
     /**
-     * Get the stream
+     * Get the send stream
      *
      * @return \Pop\Http\Client\Stream
      */
-    public function getStream()
+    public function getSendStream()
     {
-        return $this->stream;
+        return $this->sendStream;
     }
 
     /**
@@ -98,7 +108,21 @@ class Http extends AbstractAdapter
      */
     public function getStateById($id)
     {
+        $url = $this->fetchStream->getUrl();
+        $this->fetchStream->setUrl($url . '/' . $id);
+        $this->fetchStream->send();
 
+        $r = json_decode($this->fetchStream->getBody(), true);
+        if (!empty($r['old'])) {
+            $r['old'] = json_decode($r['old'], true);
+        }
+        if (!empty($r['new'])) {
+            $r['new'] = json_decode($r['new'], true);
+        }
+
+        $this->fetchStream->setUrl($url);
+
+        return $r;
     }
 
     /**
@@ -110,32 +134,97 @@ class Http extends AbstractAdapter
      */
     public function getStateByModel($model, $modelId = null)
     {
+        $fields = [
+            'filter' => [
+                'model' => $model
+            ]
+        ];
 
+        if (null !== $modelId) {
+            $fields['filter']['model_id'] = $modelId;
+        }
+
+        $this->fetchStream->setFields($fields);
+        $this->fetchStream->send();
+
+        return json_decode($this->fetchStream->getBody(), true);
     }
 
     /**
      * Get model state by timestamp
      *
      * @param  string $from
-     * @param  string $to
+     * @param  string $backTo
      * @return array
      */
-    public function getStateByTimestamp($from, $to = null)
+    public function getStateByTimestamp($from, $backTo = null)
     {
+        $url  = $this->fetchStream->getUrl();
+        $from = date('Y-m-d H:i:s', $from);
 
+        if (null !== $backTo) {
+            $backTo = date('Y-m-d H:i:s', $backTo);
+        }
+
+        $fields = [
+            'filter' => [
+                'timestamp <= ' . $from
+            ]
+        ];
+
+        if (null !== $backTo) {
+            $fields['filter'][] = 'timestamp >= ' . $backTo;
+        }
+
+        $this->fetchStream->setUrl($url . '?' . http_build_query($fields));
+        $this->fetchStream->send();
+
+        $r = json_decode($this->fetchStream->getBody(), true);
+
+        $this->fetchStream->setUrl($url);
+
+        return $r;
     }
-
 
     /**
      * Get model state by date
      *
      * @param  string $from
-     * @param  string $to
+     * @param  string $backTo
      * @return array
      */
-    public function getStateByDate($from, $to = null)
+    public function getStateByDate($from, $backTo = null)
     {
+        $url = $this->fetchStream->getUrl();
 
+        if (strpos($from, ' ') === false) {
+            $from .= ' 23:59:59';
+        }
+
+        if (null !== $backTo) {
+            if (strpos($backTo, ' ') === false) {
+                $backTo .= ' 00:00:00';
+            }
+        }
+
+        $fields = [
+            'filter' => [
+                'timestamp <= ' . $from
+            ]
+        ];
+
+        if (null !== $backTo) {
+            $fields['filter'][] = 'timestamp >= ' . $backTo;
+        }
+
+        $this->fetchStream->setUrl($url . '?' . http_build_query($fields));
+        $this->fetchStream->send();
+
+        $r = json_decode($this->fetchStream->getBody(), true);
+
+        $this->fetchStream->setUrl($url);
+
+        return $r;
     }
 
     /**
@@ -147,7 +236,30 @@ class Http extends AbstractAdapter
      */
     public function getSnapshot($id, $post = false)
     {
+        $url = $this->fetchStream->getUrl();
+        $this->fetchStream->setUrl($url . '/' . $id);
+        $this->fetchStream->send();
 
+        $r = json_decode($this->fetchStream->getBody(), true);
+
+        if (!empty($r['old'])) {
+            $r['old'] = json_decode($r['old'], true);
+        }
+        if (!empty($r['new'])) {
+            $r['new'] = json_decode($r['new'], true);
+        }
+
+        $snapshot = [];
+
+        if (!($post) && !empty($r['old'])) {
+            $snapshot = $r['old'];
+        } else if (($post) && !empty($r['new'])) {
+            $snapshot = $r['new'];
+        }
+
+        $this->fetchStream->setUrl($url);
+
+        return $snapshot;
     }
 
 }

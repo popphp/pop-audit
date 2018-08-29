@@ -217,7 +217,6 @@ class File extends AbstractAdapter
         return $results;
     }
 
-
     /**
      * Get model state by date
      *
