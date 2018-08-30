@@ -407,6 +407,13 @@ abstract class AbstractAdapter implements AdapterInterface
     abstract public function send();
 
     /**
+     * Get model states
+     *
+     * @return array
+     */
+    abstract public function getStates();
+
+    /**
      * Get model state by ID
      *
      * @param  int $id

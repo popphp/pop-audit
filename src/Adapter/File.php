@@ -145,6 +145,44 @@ class File extends AbstractAdapter
     }
 
     /**
+     * Get model states
+     *
+     * @param  string $sort
+     * @param  int    $limit
+     * @param  int    $offset
+     * @return array
+     */
+    public function getStates($sort = 'DESC', $limit = null, $offset = null)
+    {
+        $files     = scandir($this->folder);
+        $fileNames = [];
+        $results   = [];
+
+        foreach ($files as $file) {
+            if (($file != '.') && ($file != '..')) {
+                $mtime = filemtime($this->folder . DIRECTORY_SEPARATOR . $file);
+                $fileNames[$mtime] = $file;
+            }
+        }
+
+        if ($sort == 'ASC') {
+            ksort($fileNames, SORT_NUMERIC);
+        } else {
+            krsort($fileNames, SORT_NUMERIC);
+        }
+
+        if (null !== $limit) {
+            $fileNames = array_slice($fileNames, (int)$offset, (int)$limit);
+        }
+
+        foreach ($fileNames as $fileName) {
+            $results[$fileName] = $this->decode($fileName);
+        }
+
+        return $results;
+    }
+
+    /**
      * Get model state by ID
      *
      * @param  int $id

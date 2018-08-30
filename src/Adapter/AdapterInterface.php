@@ -218,6 +218,13 @@ interface AdapterInterface
     public function send();
 
     /**
+     * Get model states
+     *
+     * @return array
+     */
+    public function getStates();
+
+    /**
      * Get model state by ID
      *
      * @param  int $id

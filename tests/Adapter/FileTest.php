@@ -55,6 +55,13 @@ class FileTest extends TestCase
         $this->assertEquals('admin', $data['old']['username']);
         $this->assertEquals('admin2', $data['new']['username']);
 
+        $states = $adapter->getStates();
+        $this->assertGreaterThan(0, count($states));
+
+        $states = $adapter->getStates('ASC', 1, 1);
+        $this->assertGreaterThan(0, count($states));
+
+        $stateById = $adapter->getStateById($id);
         $stateById = $adapter->getStateById($id);
         $stateById = reset($stateById);
         $this->assertEquals('admin', $stateById['old']['username']);

@@ -111,6 +111,22 @@ class Http extends AbstractAdapter
     }
 
     /**
+     * Get model states
+     *
+     * @param  array $fields
+     * @return array
+     */
+    public function getStates(array $fields = [])
+    {
+        if (!empty($fields)) {
+            $this->fetchStream->setFields($fields);
+        }
+        $this->fetchStream->send();
+
+        return json_decode($this->fetchStream->getBody(), true);
+    }
+
+    /**
      * Get model state by ID
      *
      * @param  int $id

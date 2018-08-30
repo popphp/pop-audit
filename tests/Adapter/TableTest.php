@@ -37,6 +37,12 @@ class TableTest extends TestCase
         $new = json_decode($row->new, true);
         $this->assertEquals('admin2', $new['username']);
 
+        $states = $adapter->getStates();
+        $this->assertGreaterThan(0, count($states));
+
+        $states = $adapter->getStates(['timestamp-' => null]);
+        $this->assertGreaterThan(0, count($states));
+
         $stateById = $adapter->getStateById($row->id);
         $this->assertEquals('admin', $stateById['old']['username']);
         $this->assertEquals('admin2', $stateById['new']['username']);

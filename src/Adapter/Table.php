@@ -92,6 +92,24 @@ class Table extends AbstractAdapter
     }
 
     /**
+     * Get model states
+     *
+     * @param  array $columns
+     * @param  array $options
+     * @return array
+     */
+    public function getStates(array $columns = null, array $options = null)
+    {
+        if (null !== $columns) {
+            $result = call_user_func_array($this->table . '::findBy', ['columns' => $columns, 'options' => $options]);
+        } else {
+            $result = call_user_func_array($this->table . '::findAll', ['options' => $options]);
+        }
+
+        return $result->toArray();
+    }
+
+    /**
      * Get model state by ID
      *
      * @param  int $id
