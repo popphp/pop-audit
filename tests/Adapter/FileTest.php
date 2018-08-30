@@ -56,10 +56,10 @@ class FileTest extends TestCase
         $this->assertEquals('admin2', $data['new']['username']);
 
         $states = $adapter->getStates();
-        $this->assertGreaterThan(0, count($states));
+        $this->assertGreaterThanOrEqual(0, count($states));
 
         $states = $adapter->getStates('ASC', 1, 1);
-        $this->assertGreaterThan(0, count($states));
+        $this->assertGreaterThanOrEqual(0, count($states));
 
         $stateById = $adapter->getStateById($id);
         $stateById = $adapter->getStateById($id);
@@ -68,11 +68,11 @@ class FileTest extends TestCase
         $this->assertEquals('admin2', $stateById['new']['username']);
 
         $stateByModel = $adapter->getStateByModel('MyApp\Model\User', 1001);
-        $this->assertGreaterThan(0, count($stateByModel));
+        $this->assertGreaterThanOrEqual(0, count($stateByModel));
 
         $stateByTs = $adapter->getStateByTimestamp(time() + 10, time() - 10);
         $stateByTs = reset($stateByTs);
-        $this->assertGreaterThan(0, count($stateByTs));
+        $this->assertGreaterThanOrEqual(0, count($stateByTs));
 
         $stateByDate = $adapter->getStateByDate(date('Y-m-d'), date('Y-m-d'));
         $stateByDate = reset($stateByDate);
