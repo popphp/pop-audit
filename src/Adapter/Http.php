@@ -75,6 +75,16 @@ class Http extends AbstractAdapter
     }
 
     /**
+     * Determine if the adapter has a fetch stream
+     *
+     * @return boolean
+     */
+    public function hasFetchStream()
+    {
+        return (null !== $this->fetchStream);
+    }
+
+    /**
      * Send the results of the audit
      *
      * @throws Exception

@@ -46,6 +46,8 @@ class HttpTest extends TestCase
         $snapshot = $adapter->getSnapshot(null);
         $this->assertEquals(0, count($snapshot));
 
+        $this->assertTrue($adapter->hasFetchStream());
+
         $this->assertInstanceOf('Pop\Http\Client\Stream', $result);
     }
 
