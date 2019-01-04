@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2018 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -13,13 +13,15 @@
  */
 namespace Pop\Audit\Adapter;
 
+use Pop\Http\Client\Stream;
+
 /**
  * Auditor HTTP class
  *
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2018 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  * @version    1.0.0
  */
@@ -28,13 +30,13 @@ class Http extends AbstractAdapter
 
     /**
      * Stream to send the audit results
-     * @var \Pop\Http\Client\Stream
+     * @var Stream
      */
     protected $sendStream = null;
 
     /**
      * Stream to fetch the audit results
-     * @var \Pop\Http\Client\Stream
+     * @var Stream
      */
     protected $fetchStream = null;
 
@@ -43,10 +45,10 @@ class Http extends AbstractAdapter
      *
      * Instantiate the HTTP adapter object
      *
-     * @param  \Pop\Http\Client\Stream $sendStream
-     * @param  \Pop\Http\Client\Stream $fetchStream
+     * @param Stream $sendStream
+     * @param Stream $fetchStream
      */
-    public function __construct(\Pop\Http\Client\Stream $sendStream, \Pop\Http\Client\Stream $fetchStream = null)
+    public function __construct(Stream $sendStream, Stream $fetchStream = null)
     {
         $this->sendStream = $sendStream;
         if (null !== $fetchStream) {
@@ -57,7 +59,7 @@ class Http extends AbstractAdapter
     /**
      * Get the send stream
      *
-     * @return \Pop\Http\Client\Stream
+     * @return Stream
      */
     public function getSendStream()
     {
@@ -67,7 +69,7 @@ class Http extends AbstractAdapter
     /**
      * Get the fetch stream
      *
-     * @return \Pop\Http\Client\Stream
+     * @return Stream
      */
     public function getFetchStream()
     {
@@ -88,7 +90,7 @@ class Http extends AbstractAdapter
      * Send the results of the audit
      *
      * @throws Exception
-     * @return \Pop\Http\Client\Stream
+     * @return Stream
      */
     public function send()
     {
