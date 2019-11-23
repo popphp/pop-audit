@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2020 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\Audit\Adapter;
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2020 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    1.1.3
+ * @version    1.2.0
  */
 abstract class AbstractAdapter implements AdapterInterface
 {
@@ -397,6 +397,30 @@ abstract class AbstractAdapter implements AdapterInterface
     public function hasDiff()
     {
         return ((null !== $this->action) && ($this->original !== $this->modified));
+    }
+
+    /**
+     * Prepare data
+     *
+     * @param  boolean $jsonEncode
+     * @return array
+     */
+    public function prepareData($jsonEncode = true)
+    {
+        return [
+            'user_id'   => $this->userId,
+            'username'  => $this->username,
+            'domain'    => $this->domain,
+            'route'     => $this->route,
+            'method'    => $this->method,
+            'model'     => $this->model,
+            'model_id'  => $this->modelId,
+            'action'    => $this->action,
+            'old'       => ($jsonEncode) ? json_encode($this->original) : $this->original,
+            'new'       => ($jsonEncode) ? json_encode($this->modified) : $this->modified,
+            'metadata'  => ($jsonEncode) ? json_encode($this->metadata) : $this->metadata,
+            'timestamp' => date('Y-m-d H:i:s')
+        ];
     }
 
     /**

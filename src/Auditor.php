@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2020 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -21,9 +21,9 @@ use Pop\Audit\Adapter\AdapterInterface;
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2020 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    1.1.3
+ * @version    1.2.0
  */
 class Auditor
 {
@@ -68,7 +68,6 @@ class Auditor
         if (null !== $model) {
             $this->adapter->setModel($model);
         }
-
         if (null !== $modelId) {
             $this->adapter->setModelId($modelId);
         }
@@ -88,7 +87,6 @@ class Auditor
         if (null !== $username) {
             $this->adapter->setUsername($username);
         }
-
         if (null !== $userId) {
             $this->adapter->setUserId($userId);
         }
@@ -115,6 +113,7 @@ class Auditor
         if (null !== $method) {
             $this->adapter->setMethod($method);
         }
+
         return $this;
     }
 

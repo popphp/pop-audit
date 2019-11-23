@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2020 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -21,9 +21,9 @@ use Pop\Http\Client\Stream;
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2020 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    1.1.3
+ * @version    1.2.0
  */
 class Http extends AbstractAdapter
 {
@@ -50,10 +50,34 @@ class Http extends AbstractAdapter
      */
     public function __construct(Stream $sendStream, Stream $fetchStream = null)
     {
-        $this->sendStream = $sendStream;
+        $this->setSendStream($sendStream);
         if (null !== $fetchStream) {
-            $this->fetchStream = $fetchStream;
+            $this->setFetchStream($fetchStream);
         }
+    }
+
+    /**
+     * Set the send stream
+     *
+     * @param  Stream $sendStream
+     * @return Http
+     */
+    public function setSendStream(Stream $sendStream)
+    {
+        $this->sendStream = $sendStream;
+        return $this;
+    }
+
+    /**
+     * Set the fetch stream
+     *
+     * @param  Stream $fetchStream
+     * @return Http
+     */
+    public function setFetchStream(Stream $fetchStream)
+    {
+        $this->fetchStream = $fetchStream;
+        return $this;
     }
 
     /**
@@ -74,6 +98,29 @@ class Http extends AbstractAdapter
     public function getFetchStream()
     {
         return $this->fetchStream;
+    }
+
+    /**
+     * Get the fetched result
+     *
+     * @return mixed
+     */
+    public function getFetchedResult()
+    {
+        $resultResponse = null;
+
+        if (($this->fetchStream->hasResponse()) && ($this->fetchStream->getResponse()->hasBody())) {
+            $resultResponse = $this->fetchStream->getResponse()->getBody()->getContent();
+            if ($this->fetchStream->getResponse()->hasHeader('Content-Type')) {
+                if ($this->fetchStream->getResponse()->getHeader('Content-Type')->getValue() == 'application/json') {
+                    $resultResponse = json_decode($resultResponse, true);
+                } else if ($this->fetchStream->getResponse()->getHeader('Content-Type')->getValue() == 'application/x-www-form-urlencoded') {
+                    parse_str($resultResponse, $resultResponse);
+                }
+            }
+        }
+
+        return $resultResponse;
     }
 
     /**
@@ -101,22 +148,7 @@ class Http extends AbstractAdapter
             throw new Exception('The model has not been set.');
         }
 
-        $data = [
-            'user_id'   => $this->userId,
-            'username'  => $this->username,
-            'domain'    => $this->domain,
-            'route'     => $this->route,
-            'method'    => $this->method,
-            'model'     => $this->model,
-            'model_id'  => $this->modelId,
-            'action'    => $this->action,
-            'old'       => json_encode($this->original),
-            'new'       => json_encode($this->modified),
-            'metadata'  => json_encode($this->metadata),
-            'timestamp' => date('Y-m-d H:i:s')
-        ];
-
-        $this->sendStream->setFields($data);
+        $this->sendStream->setFields($this->prepareData());
         $this->sendStream->send();
 
         return $this->sendStream;
@@ -135,32 +167,39 @@ class Http extends AbstractAdapter
         }
         $this->fetchStream->send();
 
-        return json_decode($this->fetchStream->getBody(), true);
+        return $this->getFetchedResult();
     }
 
     /**
      * Get model state by ID
      *
-     * @param  int $id
+     * @param  int     $id
+     * @param  boolean $asQuery
      * @return array
      */
-    public function getStateById($id)
+    public function getStateById($id, $asQuery = false)
     {
-        $url = $this->fetchStream->getUrl();
-        $this->fetchStream->setUrl($url . '/' . $id);
+        $origUrl = $this->fetchStream->getUrl();
+
+        if ($asQuery) {
+            $this->fetchStream->setField('id', $id);
+        } else {
+            $this->fetchStream->setUrl($origUrl . '/' . $id);
+        }
+
         $this->fetchStream->send();
+        $result = $this->getFetchedResult();
 
-        $r = json_decode($this->fetchStream->getBody(), true);
-        if (!empty($r['old'])) {
-            $r['old'] = json_decode($r['old'], true);
+        if (!empty($result['old'])) {
+            $result['old'] = json_decode($result['old'], true);
         }
-        if (!empty($r['new'])) {
-            $r['new'] = json_decode($r['new'], true);
+        if (!empty($result['new'])) {
+            $result['new'] = json_decode($result['new'], true);
         }
 
-        $this->fetchStream->setUrl($url);
+        $this->fetchStream->setUrl($origUrl);
 
-        return $r;
+        return $result;
     }
 
     /**
@@ -185,7 +224,7 @@ class Http extends AbstractAdapter
         $this->fetchStream->setFields($fields);
         $this->fetchStream->send();
 
-        return json_decode($this->fetchStream->getBody(), true);
+        return $this->getFetchedResult();
     }
 
     /**
@@ -216,9 +255,7 @@ class Http extends AbstractAdapter
         $this->fetchStream->setFields($fields);
         $this->fetchStream->send();
 
-        $r = json_decode($this->fetchStream->getBody(), true);
-
-        return $r;
+        return $this->getFetchedResult();
     }
 
     /**
@@ -253,9 +290,7 @@ class Http extends AbstractAdapter
         $this->fetchStream->setFields($fields);
         $this->fetchStream->send();
 
-        $r = json_decode($this->fetchStream->getBody(), true);
-
-        return $r;
+        return $this->getFetchedResult();
     }
 
     /**
@@ -271,21 +306,21 @@ class Http extends AbstractAdapter
         $this->fetchStream->setUrl($url . '/' . $id);
         $this->fetchStream->send();
 
-        $r = json_decode($this->fetchStream->getBody(), true);
+        $result = $this->getFetchedResult();
 
-        if (!empty($r['old'])) {
-            $r['old'] = json_decode($r['old'], true);
+        if (!empty($result['old'])) {
+            $result['old'] = json_decode($result['old'], true);
         }
-        if (!empty($r['new'])) {
-            $r['new'] = json_decode($r['new'], true);
+        if (!empty($result['new'])) {
+            $result['new'] = json_decode($result['new'], true);
         }
 
         $snapshot = [];
 
-        if (!($post) && !empty($r['old'])) {
-            $snapshot = $r['old'];
-        } else if (($post) && !empty($r['new'])) {
-            $snapshot = $r['new'];
+        if (!($post) && !empty($result['old'])) {
+            $snapshot = $result['old'];
+        } else if (($post) && !empty($result['new'])) {
+            $snapshot = $result['new'];
         }
 
         $this->fetchStream->setUrl($url);

@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2020 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\Audit\Adapter;
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2020 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    1.1.3
+ * @version    1.2.0
  */
 class File extends AbstractAdapter
 {
@@ -122,24 +122,12 @@ class File extends AbstractAdapter
             throw new Exception('The model has not been set.');
         }
 
-        $data = [
-            'user_id'   => $this->userId,
-            'username'  => $this->username,
-            'domain'    => $this->domain,
-            'route'     => $this->route,
-            'method'    => $this->method,
-            'model'     => $this->model,
-            'model_id'  => $this->modelId,
-            'action'    => $this->action,
-            'old'       => $this->original,
-            'new'       => $this->modified,
-            'metadata'  => $this->metadata,
-            'timestamp' => date('Y-m-d H:i:s')
-        ];
-
         $id       = md5($this->model . '-' . $this->modelId) . '-' .uniqid() . '-' . time();
         $filename = $this->prefix . $id . '.log';
-        file_put_contents($this->folder . DIRECTORY_SEPARATOR . $filename, json_encode($data, JSON_PRETTY_PRINT));
+        file_put_contents(
+            $this->folder . DIRECTORY_SEPARATOR . $filename,
+            json_encode($this->prepareData(false), JSON_PRETTY_PRINT)
+        );
 
         return $filename;
     }

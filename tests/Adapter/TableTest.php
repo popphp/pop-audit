@@ -11,16 +11,20 @@ class TableTest extends TestCase
 
     public function testConstructor()
     {
-        copy(__DIR__ . '/../tmp/auditor.sqlite.orig', __DIR__ . '/../tmp/auditor.sqlite');
+        chmod(__DIR__ . '/../tmp', 0777);
+        touch(__DIR__ . '/../tmp/auditor.sqlite');
         chmod(__DIR__ . '/../tmp/auditor.sqlite', 0777);
 
-        AuditLog::setDb(\Pop\Db\Db::sqliteConnect([
+
+        $db = \Pop\Db\Db::sqliteConnect([
             'database' => __DIR__ . '/../tmp/auditor.sqlite'
-        ]));
+        ]);
+        AuditLog::setDb($db);
 
         $adapter = new Adapter\Table('Pop\Audit\Test\Assets\AuditLog');
         $this->assertInstanceOf('Pop\Audit\Adapter\Table', $adapter);
         $this->assertEquals('Pop\Audit\Test\Assets\AuditLog', $adapter->getTable());
+        $this->assertTrue($db->hasTable(AuditLog::table()));
     }
 
     public function testSend()
@@ -84,5 +88,7 @@ class TableTest extends TestCase
         $adapter = new Adapter\Table('Pop\Audit\Test\Assets\AuditLog');
         $adapter->resolveDiff($old, $new);
         $adapter->send();
+
+        unlink(__DIR__ . '/../tmp/auditor.sqlite');
     }
 }

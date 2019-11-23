@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2020 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\Audit\Adapter;
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2020 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    1.1.3
+ * @version    1.2.0
  */
 class Table extends AbstractAdapter
 {
@@ -41,7 +41,25 @@ class Table extends AbstractAdapter
      */
     public function __construct($table)
     {
+        $this->setTable($table);
+        $db        = call_user_func($this->table . '::getDb');
+        $tableName = call_user_func($this->table . '::table');
+
+        if (!($db->hasTable($tableName))) {
+            $this->createTable($tableName);
+        }
+    }
+
+    /**
+     * Set the table
+     *
+     * @param  string $table
+     * @return Table
+     */
+    public function setTable($table)
+    {
         $this->table = $table;
+        return $this;
     }
 
     /**
@@ -69,23 +87,8 @@ class Table extends AbstractAdapter
             throw new Exception('The model has not been set.');
         }
 
-        $data = [
-            'user_id'   => $this->userId,
-            'username'  => $this->username,
-            'domain'    => $this->domain,
-            'route'     => $this->route,
-            'method'    => $this->method,
-            'model'     => $this->model,
-            'model_id'  => $this->modelId,
-            'action'    => $this->action,
-            'old'       => json_encode($this->original),
-            'new'       => json_encode($this->modified),
-            'metadata'  => json_encode($this->metadata),
-            'timestamp' => date('Y-m-d H:i:s')
-        ];
-
         $className = $this->table;
-        $table     = new $className($data);
+        $table     = new $className($this->prepareData());
         $table->save();
 
         return $table;
@@ -117,17 +120,17 @@ class Table extends AbstractAdapter
      */
     public function getStateById($id)
     {
-        $result = call_user_func_array($this->table . '::findById', ['id' => $id]);
-        $r      = $result->toArray();
+        $record = call_user_func_array($this->table . '::findById', ['id' => $id]);
+        $result = $record->toArray();
 
-        if (!empty($r['old'])) {
-            $r['old'] = json_decode($r['old'], true);
+        if (!empty($result['old'])) {
+            $result['old'] = json_decode($result['old'], true);
         }
-        if (!empty($r['new'])) {
-            $r['new'] = json_decode($r['new'], true);
+        if (!empty($result['new'])) {
+            $result['new'] = json_decode($result['new'], true);
         }
 
-        return $r;
+        return $result;
     }
 
     /**
@@ -209,6 +212,35 @@ class Table extends AbstractAdapter
         }
 
         return $snapshot;
+    }
+
+    /**
+     * Create table in database
+     *
+     * @param  string $tableName
+     * @return void
+     */
+    protected function createTable($tableName)
+    {
+        $db     = call_user_func($this->table . '::getDb');
+        $schema = $db->createSchema();
+        $schema->create($tableName)
+            ->int('id')->increment()
+            ->int('user_id')
+            ->varchar('username', 255)
+            ->varchar('domain', 255)
+            ->varchar('route', 255)
+            ->varchar('method', 255)
+            ->varchar('model', 255)->notNullable()
+            ->int('model_id')->notNullable()
+            ->varchar('action', 255)->notNullable()
+            ->text('old')
+            ->text('new')
+            ->text('metadata')
+            ->datetime('timestamp')->notNullable()
+            ->primary('id');
+
+        $db->query($schema);
     }
 
 }

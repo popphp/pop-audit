@@ -29,19 +29,19 @@ class HttpTest extends TestCase
         $result = $adapter->send();
 
         $states = $adapter->getStates(['filter' => 'timestamp >=' . date('Y-m-d')]);
-        $this->assertNull($states);
+        $this->assertNotNull($states);
 
         $state = $adapter->getStateById(null);
-        $this->assertNull($state);
+        $this->assertNotNull($state);
 
         $states = $adapter->getStateByModel('MyApp\Model\User', 1001);
-        $this->assertNull($states);
+        $this->assertNotNull($states);
 
         $states = $adapter->getStateByTimestamp(time(), time() - 1000);
-        $this->assertNull($states);
+        $this->assertNotNull($states);
 
         $states = $adapter->getStateByDate(date('Y-m-d'), date('Y-m-d', time() - 1000));
-        $this->assertNull($states);
+        $this->assertNotNull($states);
 
         $snapshot = $adapter->getSnapshot(null);
         $this->assertEquals(0, count($snapshot));
