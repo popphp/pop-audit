@@ -23,7 +23,7 @@ use Pop\Http\Client\Stream;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    1.3.0
+ * @version    1.3.2
  */
 class Http extends AbstractAdapter
 {
@@ -111,10 +111,11 @@ class Http extends AbstractAdapter
 
         if (($this->fetchStream->hasResponse()) && ($this->fetchStream->getResponse()->hasBody())) {
             $resultResponse = $this->fetchStream->getResponse()->getBody()->getContent();
-            if ($this->fetchStream->getResponse()->hasHeader('Content-Type')) {
-                if ($this->fetchStream->getResponse()->getHeader('Content-Type')->getValue() == 'application/json') {
+            if (($this->fetchStream->getResponse()->hasHeader('Content-Type')) &&
+                (count($this->fetchStream->getResponse()->getHeader('Content-Type')->getValues()) == 1)) {
+                if ($this->fetchStream->getResponse()->getHeader('Content-Type')->getValue(0) == 'application/json') {
                     $resultResponse = json_decode($resultResponse, true);
-                } else if ($this->fetchStream->getResponse()->getHeader('Content-Type')->getValue() == 'application/x-www-form-urlencoded') {
+                } else if ($this->fetchStream->getResponse()->getHeader('Content-Type')->getValue(0) == 'application/x-www-form-urlencoded') {
                     parse_str($resultResponse, $resultResponse);
                 }
             }
