@@ -10,6 +10,7 @@ CREATE TABLE "audit_log" (
   "action" varchar NOT NULL,
   "old" text,
   "new" text,
+  "state" text,
   "metadata" text,
   "timestamp" datetime NOT NULL,
   UNIQUE ("id")

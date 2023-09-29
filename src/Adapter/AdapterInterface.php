@@ -186,6 +186,29 @@ interface AdapterInterface
     public function getMetadata($name = null);
 
     /**
+     * Set the final state data
+     *
+     * @param  array $state
+     * @return static
+     */
+    public function setStateData(array $state);
+
+    /**
+     * Determine if there is a final state
+     *
+     * @return boolean
+     */
+    public function hasStateData();
+
+    /**
+     * Get the final state
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function getStateData($name = null);
+
+    /**
      * Set the differences in values between the model states (that have already been processed)
      *
      * @param  array $old

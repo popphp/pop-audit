@@ -65,6 +65,12 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $modified = [];
 
     /**
+     * Final state data
+     * @var array
+     */
+    protected $stateData = [];
+
+    /**
      * Username
      * @var string
      */
@@ -340,6 +346,43 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
+     * Set the final state data
+     *
+     * @param  array $state
+     * @return static
+     */
+    public function setStateData(array $state)
+    {
+        $this->stateData = $state;
+        return $this;
+    }
+
+    /**
+     * Determine if there is a final state
+     *
+     * @return boolean
+     */
+    public function hasStateData()
+    {
+        return !empty($this->stateData);
+    }
+
+    /**
+     * Get the final state
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function getStateData($name = null)
+    {
+        if (null !== $name) {
+            return (isset($this->stateData[$name])) ? $this->stateData[$name] : null;
+        } else {
+            return $this->stateData;
+        }
+    }
+
+    /**
      * Set the differences in values between the model states (that have already been processed)
      *
      * @param  array $old
@@ -418,6 +461,7 @@ abstract class AbstractAdapter implements AdapterInterface
             'action'    => $this->action,
             'old'       => ($jsonEncode) ? json_encode($this->original) : $this->original,
             'new'       => ($jsonEncode) ? json_encode($this->modified) : $this->modified,
+            'state'     => ($jsonEncode) ? json_encode($this->stateData) : $this->stateData,
             'metadata'  => ($jsonEncode) ? json_encode($this->metadata) : $this->metadata,
             'timestamp' => date('Y-m-d H:i:s')
         ];
