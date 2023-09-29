@@ -236,6 +236,7 @@ class Table extends AbstractAdapter
             ->varchar('action', 255)->notNullable()
             ->text('old')
             ->text('new')
+            ->text('state')
             ->text('metadata')
             ->datetime('timestamp')->notNullable()
             ->primary('id');
