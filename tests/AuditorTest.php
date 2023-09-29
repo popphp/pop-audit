@@ -51,6 +51,17 @@ class AuditorTest extends TestCase
         $this->assertEquals('bar', $auditor->adapter()->getMetadata('foo'));
     }
 
+    public function testStateData()
+    {
+        $auditor = new Audit\Auditor(new Audit\Adapter\File(__DIR__ . '/tmp'));
+        $auditor->setStateData(['foo' => 'bar']);
+        $this->assertTrue($auditor->adapter()->hasStateData());
+        $this->assertTrue($auditor->adapter()->hasStateData('foo'));
+        $this->assertFalse($auditor->adapter()->hasStateData('baz'));
+        $this->assertEquals('bar', $auditor->adapter()->getStateData('foo'));
+        $this->assertEquals(['foo' => 'bar'], $auditor->adapter()->getStateData());
+    }
+
     public function testSetDiff()
     {
         $old = ['username' => 'admin'];

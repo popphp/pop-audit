@@ -41,17 +41,26 @@ $new = [
     'email'    => 'test@test.com'
 ];
 
+// Tracking the full state is optional
+$state = [
+    "id"         => 1,
+    "username"   => "admin2",
+    "first_name" => "John",
+    "last_name"  => "Doe",
+    "email"      => "test@test.com"
+];
+
 $auditor = new Audit\Auditor(new Audit\Adapter\File('tmp'));  // Folder passed to the File adapter
 $auditor->setModel('MyApp\Model\User', 1001);                 // Model name and model ID
-$auditor->setUser('testuser', 101);                           // Username and user ID (optional)
+$auditor->setUser('testuser', 101);                           // Username and user ID that made the change (optional)
 $auditor->setDomain('users.localhost');                       // Domain (optional)
-$logFile = $auditor->send($old, $new);
+$logFile = $auditor->send($old, $new, $state);
 ```
 
 In this case, the variable `$logFile` would contain the name of the audit log file,
 for example `pop-audit-1535060625.log` in case it needs to be referenced again.
 That file will contain the JSON-encoded data that tracks the difference between the
-model states:
+model states, as well as a snapshot of the full state (if provided):
 
 ```json
 {
@@ -67,11 +76,16 @@ model states:
     "new": {
         "username": "admin2"
     },
+    "state": {
+        "id": 1,
+        "username": "admin2",
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "test@test.com"
+    },
     "timestamp": "2018-08-23 16:56:36"
 }
 ```
-
-Notice that only the difference is stored. In this case, only the `username` value changed.
 
 ### Using a database
 
@@ -104,12 +118,20 @@ $new = [
     'email'      => 'test@test.com'
 ];
 
+// Tracking the full state is optional
+$state = [
+    "id"         => 1,
+    "username"   => "admin2",
+    "first_name" => "John",
+    "last_name"  => "Doe",
+    "email"      => "test@test.com"
+];
 
 $auditor = new Audit\Auditor(new Audit\Adapter\Table('AuditLog'));
 $auditor->setModel('MyApp\Model\User', 1001);
 $auditor->setUser('testuser', 101);
 $auditor->setDomain('users.localhost');
-$row = $auditor->send($old, $new);
+$row = $auditor->send($old, $new, $state);
 ```
 
 If needed, the variable `$row` contains the newly created record in the audit table.
@@ -131,6 +153,15 @@ $new = [
     'email'      => 'test@test.com'
 ];
 
+// Tracking the full state is optional
+$state = [
+    "id"         => 1,
+    "username"   => "admin2",
+    "first_name" => "John",
+    "last_name"  => "Doe",
+    "email"      => "test@test.com"
+];
+
 $stream = new \Pop\Http\Client\Stream('http://audit.localhost');
 $stream->setContextOptions(['http' => [
     'protocol_version' => '1.1',
@@ -142,7 +173,7 @@ $auditor = new Audit\Auditor(new Audit\Adapter\Http($stream));
 $auditor->setModel('MyApp\Model\User', 1001);
 $auditor->setUser('testuser', 101);
 $auditor->setDomain('users.localhost');
-$auditor->send($old, $new);
+$auditor->send($old, $new, $state);
 ```
 
 ### Setting the Diff
@@ -169,3 +200,4 @@ $auditor->setUser('testuser', 101);
 $auditor->setDomain('users.localhost');
 $auditor->setDiff($old, $new);
 $auditor->send();
+```

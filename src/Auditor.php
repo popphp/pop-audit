@@ -142,6 +142,39 @@ class Auditor
         return $this;
     }
 
+    /**
+     * Set state data
+     *
+     * @param  array $stateData
+     * @return Auditor
+     */
+    public function setStateData(array $stateData)
+    {
+        $this->adapter->setStateData($stateData);
+        return $this;
+    }
+
+    /**
+     * Get state data
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function getStateData($name = null)
+    {
+        return $this->adapter->getStateData($name);
+    }
+
+    /**
+     * Has state data
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function hasStateData($name = null)
+    {
+        return $this->adapter->hasStateData($name);
+    }
 
     /**
      * Set the differences in values between the model states (that have already been processed)
@@ -184,12 +217,16 @@ class Auditor
      *
      * @param  array $old
      * @param  array $new
+     * @param  array $state
      * @return mixed
      */
-    public function send(array $old = null, array $new = null)
+    public function send(array $old = null, array $new = null, array $state = null)
     {
         if ((null !== $old) && (null !== $new)) {
             $this->adapter->resolveDiff($old, $new);
+        }
+        if (null !== $state) {
+            $this->adapter->setStateData($state);
         }
 
         return ($this->adapter->hasDiff()) ? $this->adapter->send() : false;

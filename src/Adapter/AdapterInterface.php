@@ -194,19 +194,19 @@ interface AdapterInterface
     public function setStateData(array $state);
 
     /**
-     * Determine if there is a final state
-     *
-     * @return boolean
-     */
-    public function hasStateData();
-
-    /**
      * Get the final state
      *
      * @param  string $name
      * @return mixed
      */
     public function getStateData($name = null);
+
+    /**
+     * Determine if there is a final state
+     *
+     * @return boolean
+     */
+    public function hasStateData();
 
     /**
      * Set the differences in values between the model states (that have already been processed)

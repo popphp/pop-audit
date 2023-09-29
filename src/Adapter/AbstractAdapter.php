@@ -358,16 +358,6 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
-     * Determine if there is a final state
-     *
-     * @return boolean
-     */
-    public function hasStateData()
-    {
-        return !empty($this->stateData);
-    }
-
-    /**
      * Get the final state
      *
      * @param  string $name
@@ -380,6 +370,17 @@ abstract class AbstractAdapter implements AdapterInterface
         } else {
             return $this->stateData;
         }
+    }
+
+    /**
+     * Determine if there is final state data
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function hasStateData($name = null)
+    {
+        return (null !== $name) ? array_key_exists($name, $this->stateData) : !empty($this->stateData);
     }
 
     /**
