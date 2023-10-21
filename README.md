@@ -17,6 +17,12 @@ Install `pop-audit` using Composer.
 
     composer require popphp/pop-audit
 
+Or, require it in your composer.json file
+
+    "require": {
+        "popphp/pop-audit" : "^2.0.0"
+    }
+
 BASIC USAGE
 -----------
 

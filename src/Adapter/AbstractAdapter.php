@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\Audit\Adapter;
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    1.3.2
+ * @version    2.0.0
  */
 abstract class AbstractAdapter implements AdapterInterface
 {
@@ -36,83 +36,83 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * Model name
-     * @var string
+     * @var ?string
      */
-    protected $model = null;
+    protected ?string $model = null;
 
     /**
      * Model ID
-     * @var int
+     * @var int|string|null
      */
-    protected $modelId = null;
+    protected int|string|null $modelId = null;
 
     /**
      * Action (created, updated, deleted)
-     * @var string
+     * @var ?string
      */
-    protected $action = null;
+    protected ?string $action = null;
 
     /**
      * Original model state differences
      * @var array
      */
-    protected $original = [];
+    protected array $original = [];
 
     /**
      * Modified model state differences
      * @var array
      */
-    protected $modified = [];
+    protected array $modified = [];
 
     /**
      * Final state data
      * @var array
      */
-    protected $stateData = [];
+    protected array $stateData = [];
 
     /**
      * Username
-     * @var string
+     * @var ?string
      */
-    protected $username = null;
+    protected ?string $username = null;
 
     /**
      * User ID
-     * @var int
+     * @var int|string|null
      */
-    protected $userId = null;
+    protected int|string|null $userId = null;
 
     /**
      * Domain
-     * @var string
+     * @var ?string
      */
-    protected $domain = null;
+    protected ?string $domain = null;
 
     /**
      * Route
-     * @var string
+     * @var ?string
      */
-    protected $route = null;
+    protected ?string $route = null;
 
     /**
      * Method
-     * @var string
+     * @var ?string
      */
-    protected $method = null;
+    protected ?string $method = null;
 
     /**
      * Metadata
      * @var array
      */
-    protected $metadata = [];
+    protected array$metadata = [];
 
     /**
      * Set the model name
      *
      * @param  string $model
-     * @return self
+     * @return AbstractAdapter
      */
-    public function setModel($model)
+    public function setModel(string $model): AbstractAdapter
     {
         $this->model = $model;
         return $this;
@@ -121,10 +121,10 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Set the model ID
      *
-     * @param  int $modelId
-     * @return self
+     * @param  int|string $modelId
+     * @return AbstractAdapter
      */
-    public function setModelId($modelId)
+    public function setModelId(int|string $modelId): AbstractAdapter
     {
         $this->modelId = $modelId;
         return $this;
@@ -133,9 +133,9 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Get the model name
      *
-     * @return string
+     * @return string|null
      */
-    public function getModel()
+    public function getModel(): string|null
     {
         return $this->model;
     }
@@ -143,9 +143,9 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Get the model ID
      *
-     * @return int
+     * @return int|string|null
      */
-    public function getModelId()
+    public function getModelId(): int|string|null
     {
         return $this->modelId;
     }
@@ -153,9 +153,9 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Get the action
      *
-     * @return string
+     * @return string|null
      */
-    public function getAction()
+    public function getAction(): string|null
     {
         return $this->action;
     }
@@ -165,7 +165,7 @@ abstract class AbstractAdapter implements AdapterInterface
      *
      * @return array
      */
-    public function getOriginal()
+    public function getOriginal(): array
     {
         return $this->original;
     }
@@ -175,7 +175,7 @@ abstract class AbstractAdapter implements AdapterInterface
      *
      * @return array
      */
-    public function getModified()
+    public function getModified(): array
     {
         return $this->modified;
     }
@@ -184,9 +184,9 @@ abstract class AbstractAdapter implements AdapterInterface
      * Set the username
      *
      * @param  string $username
-     * @return self
+     * @return AbstractAdapter
      */
-    public function setUsername($username)
+    public function setUsername(string $username): AbstractAdapter
     {
         $this->username = $username;
         return $this;
@@ -195,10 +195,10 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Set the user ID
      *
-     * @param  int $userId
-     * @return self
+     * @param  int|string $userId
+     * @return AbstractAdapter
      */
-    public function setUserId($userId)
+    public function setUserId(int|string $userId): AbstractAdapter
     {
         $this->userId = $userId;
         return $this;
@@ -208,9 +208,9 @@ abstract class AbstractAdapter implements AdapterInterface
      * Set the domain
      *
      * @param  string $domain
-     * @return self
+     * @return AbstractAdapter
      */
-    public function setDomain($domain)
+    public function setDomain(string $domain): AbstractAdapter
     {
         $this->domain = $domain;
         return $this;
@@ -220,9 +220,9 @@ abstract class AbstractAdapter implements AdapterInterface
      * Set the route
      *
      * @param  string $route
-     * @return self
+     * @return AbstractAdapter
      */
-    public function setRoute($route)
+    public function setRoute($route): AbstractAdapter
     {
         $this->route = $route;
         return $this;
@@ -232,9 +232,9 @@ abstract class AbstractAdapter implements AdapterInterface
      * Set the method
      *
      * @param  string $method
-     * @return self
+     * @return AbstractAdapter
      */
-    public function setMethod($method)
+    public function setMethod(string $method): AbstractAdapter
     {
         $this->method = $method;
         return $this;
@@ -244,9 +244,9 @@ abstract class AbstractAdapter implements AdapterInterface
      * Set the metadata
      *
      * @param  array $metadata
-     * @return self
+     * @return AbstractAdapter
      */
-    public function setMetadata(array $metadata)
+    public function setMetadata(array $metadata): AbstractAdapter
     {
         $this->metadata = $metadata;
         return $this;
@@ -257,9 +257,9 @@ abstract class AbstractAdapter implements AdapterInterface
      *
      * @param  string $name
      * @param  mixed $value
-     * @return self
+     * @return AbstractAdapter
      */
-    public function addMetadata($name, $value)
+    public function addMetadata(string $name, mixed $value): AbstractAdapter
     {
         $this->metadata[$name] = $value;
         return $this;
@@ -268,9 +268,9 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Get the username
      *
-     * @return string
+     * @return string|null
      */
-    public function getUsername()
+    public function getUsername(): string|null
     {
         return $this->username;
     }
@@ -278,9 +278,9 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Get the user ID
      *
-     * @return int
+     * @return int|string|null
      */
-    public function getUserId()
+    public function getUserId(): int|string|null
     {
         return $this->userId;
     }
@@ -288,9 +288,9 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Get the domain
      *
-     * @return string
+     * @return string|null
      */
-    public function getDomain()
+    public function getDomain(): string|null
     {
         return $this->domain;
     }
@@ -298,9 +298,9 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Get the route
      *
-     * @return string
+     * @return string|null
      */
-    public function getRoute()
+    public function getRoute(): string|null
     {
         return $this->route;
     }
@@ -308,9 +308,9 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Get the method
      *
-     * @return string
+     * @return string|null
      */
-    public function getMethod()
+    public function getMethod(): string|null
     {
         return $this->method;
     }
@@ -318,12 +318,12 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Determine if there is metadata
      *
-     * @param  string $name
-     * @return boolean
+     * @param  ?string $name
+     * @return bool
      */
-    public function hasMetadata($name = null)
+    public function hasMetadata(?string $name = null): bool
     {
-        if (null !== $name) {
+        if ($name !== null) {
             return isset($this->metadata[$name]);
         } else {
             return !empty($this->metadata);
@@ -333,12 +333,12 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Get the metadata
      *
-     * @param  string $name
+     * @param  ?string $name
      * @return mixed
      */
-    public function getMetadata($name = null)
+    public function getMetadata(?string $name = null): mixed
     {
-        if (null !== $name) {
+        if ($name !== null) {
             return (isset($this->metadata[$name])) ? $this->metadata[$name] : null;
         } else {
             return $this->metadata;
@@ -349,9 +349,9 @@ abstract class AbstractAdapter implements AdapterInterface
      * Set the final state data
      *
      * @param  array $state
-     * @return static
+     * @return AbstractAdapter
      */
-    public function setStateData(array $state)
+    public function setStateData(array $state): AbstractAdapter
     {
         $this->stateData = $state;
         return $this;
@@ -360,12 +360,12 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Get the final state
      *
-     * @param  string $name
+     * @param  ?string $name
      * @return mixed
      */
-    public function getStateData($name = null)
+    public function getStateData(?string $name = null): mixed
     {
-        if (null !== $name) {
+        if ($name !== null) {
             return (isset($this->stateData[$name])) ? $this->stateData[$name] : null;
         } else {
             return $this->stateData;
@@ -375,12 +375,12 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Determine if there is final state data
      *
-     * @param  string $name
-     * @return boolean
+     * @param  ?string $name
+     * @return bool
      */
-    public function hasStateData($name = null)
+    public function hasStateData(?string $name = null): bool
     {
-        return (null !== $name) ? array_key_exists($name, $this->stateData) : !empty($this->stateData);
+        return ($name !== null) ? array_key_exists($name, $this->stateData) : !empty($this->stateData);
     }
 
     /**
@@ -388,19 +388,19 @@ abstract class AbstractAdapter implements AdapterInterface
      *
      * @param  array $old
      * @param  array $new
-     * @return self
+     * @return AbstractAdapter
      */
-    public function setDiff(array $old = [], array $new = [])
+    public function setDiff(array $old = [], array $new = []): AbstractAdapter
     {
         $this->original = $old;
         $this->modified = $new;
 
         if (empty($old) && !empty($new)) {
-            $this->action = self::CREATED;
+            $this->action = AbstractAdapter::CREATED;
         } else if (empty($new) && !empty($old)) {
-            $this->action = self::DELETED;
+            $this->action = AbstractAdapter::DELETED;
         } else {
-            $this->action = self::UPDATED;
+            $this->action = AbstractAdapter::UPDATED;
         }
 
         return $this;
@@ -411,23 +411,23 @@ abstract class AbstractAdapter implements AdapterInterface
      *
      * @param  array $old
      * @param  array $new
-     * @return self
+     * @return AbstractAdapter
      */
-    public function resolveDiff(array $old = [], array $new = [])
+    public function resolveDiff(array $old = [], array $new = []): AbstractAdapter
     {
         if (empty($old) && !empty($new)) {
             $this->modified = $new;
-            $this->action   = self::CREATED;
+            $this->action   = AbstractAdapter::CREATED;
         } else if (empty($new) && !empty($old)) {
             $this->original = $old;
-            $this->action   = self::DELETED;
+            $this->action   = AbstractAdapter::DELETED;
         } else {
             $keys = array_keys(array_diff($old, $new));
             foreach ($keys as $key) {
                 $this->original[$key] = $old[$key];
                 $this->modified[$key] = $new[$key];
             }
-            $this->action = self::UPDATED;
+            $this->action = AbstractAdapter::UPDATED;
         }
 
         return $this;
@@ -436,20 +436,20 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Check if the model states are different
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasDiff()
+    public function hasDiff(): bool
     {
-        return ((null !== $this->action) && ($this->original !== $this->modified));
+        return (($this->action !== null) && ($this->original !== $this->modified));
     }
 
     /**
      * Prepare data
      *
-     * @param  boolean $jsonEncode
+     * @param  bool $jsonEncode
      * @return array
      */
-    public function prepareData($jsonEncode = true)
+    public function prepareData(bool $jsonEncode = true): array
     {
         return [
             'user_id'   => $this->userId,
@@ -473,56 +473,57 @@ abstract class AbstractAdapter implements AdapterInterface
      *
      * @return mixed
      */
-    abstract public function send();
+    abstract public function send(): mixed;
 
     /**
      * Get model states
      *
      * @return array
      */
-    abstract public function getStates();
+    abstract public function getStates(): array;
 
     /**
      * Get model state by ID
      *
-     * @param  int $id
+     * @param  int|string $id
      * @return array
      */
-    abstract public function getStateById($id);
+    abstract public function getStateById(int|string $id): array;
 
     /**
      * Get model state by model
      *
-     * @param  string $model
-     * @param  int    $modelId
+     * @param  string          $model
+     * @param  int|string|null $modelId
      * @return array
      */
-    abstract public function getStateByModel($model, $modelId = null);
+    abstract public function getStateByModel(string $model, int|string|null $modelId = null): array;
 
     /**
      * Get model state by timestamp
      *
-     * @param  string $from
-     * @param  string $backTo
+     * @param  string  $from
+     * @param  ?string $backTo
      * @return array
      */
-    abstract public function getStateByTimestamp($from, $backTo = null);
+    abstract public function getStateByTimestamp(string $from, ?string $backTo = null): array;
 
     /**
      * Get model state by date
      *
-     * @param  string $from
-     * @param  string $backTo
+     * @param  string  $from
+     * @param  ?string $backTo
      * @return array
      */
-    abstract public function getStateByDate($from, $backTo = null);
+    abstract public function getStateByDate(string $from, ?string $backTo = null): array;
 
     /**
      * Get model snapshot by ID
      *
-     * @param  int     $id
-     * @param  boolean $post
+     * @param  int|string $id
+     * @param  bool       $post
      * @return array
      */
-    abstract public function getSnapshot($id, $post = false);
+    abstract public function getSnapshot(int|string $id, bool $post = false): array;
+
 }

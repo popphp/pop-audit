@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -13,7 +13,7 @@
  */
 namespace Pop\Audit\Adapter;
 
-use Pop\Http\Client\Stream;
+use Pop\Http\Client;
 
 /**
  * Auditor HTTP class
@@ -21,83 +21,83 @@ use Pop\Http\Client\Stream;
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    1.3.2
+ * @version    2.0.0
  */
 class Http extends AbstractAdapter
 {
 
     /**
-     * Stream to send the audit results
-     * @var Stream
+     * Client to send the audit results
+     * @var ?Client
      */
-    protected $sendStream = null;
+    protected ?Client $sendClient = null;
 
     /**
-     * Stream to fetch the audit results
-     * @var Stream
+     * Client to fetch the audit results
+     * @var ?Client
      */
-    protected $fetchStream = null;
+    protected ?Client $fetchClient = null;
 
     /**
      * Constructor
      *
      * Instantiate the HTTP adapter object
      *
-     * @param Stream $sendStream
-     * @param Stream $fetchStream
+     * @param Client  $sendClient
+     * @param ?Client $fetchClient
      */
-    public function __construct(Stream $sendStream, Stream $fetchStream = null)
+    public function __construct(Client $sendClient, ?Client $fetchClient = null)
     {
-        $this->setSendStream($sendStream);
-        if (null !== $fetchStream) {
-            $this->setFetchStream($fetchStream);
+        $this->setSendClient($sendClient);
+        if ($fetchClient !== null) {
+            $this->setFetchClient($fetchClient);
         }
     }
 
     /**
      * Set the send stream
      *
-     * @param  Stream $sendStream
+     * @param  Client $sendClient
      * @return Http
      */
-    public function setSendStream(Stream $sendStream)
+    public function setSendClient(Client $sendClient): Http
     {
-        $this->sendStream = $sendStream;
+        $this->sendClient = $sendClient;
         return $this;
     }
 
     /**
      * Set the fetch stream
      *
-     * @param  Stream $fetchStream
+     * @param  Client $fetchClient
      * @return Http
      */
-    public function setFetchStream(Stream $fetchStream)
+    public function setFetchClient(Client $fetchClient): Http
     {
-        $this->fetchStream = $fetchStream;
+        $this->fetchClient = $fetchClient;
         return $this;
     }
 
     /**
      * Get the send stream
      *
-     * @return Stream
+     * @return Client
      */
-    public function getSendStream()
+    public function getSendClient(): Client
     {
-        return $this->sendStream;
+        return $this->sendClient;
     }
 
     /**
      * Get the fetch stream
      *
-     * @return Stream
+     * @return Client
      */
-    public function getFetchStream()
+    public function getFetchClient(): Client
     {
-        return $this->fetchStream;
+        return $this->fetchClient;
     }
 
     /**
@@ -105,20 +105,12 @@ class Http extends AbstractAdapter
      *
      * @return mixed
      */
-    public function getFetchedResult()
+    public function getFetchedResult(): mixed
     {
         $resultResponse = null;
 
-        if (($this->fetchStream->hasResponse()) && ($this->fetchStream->getResponse()->hasBody())) {
-            $resultResponse = $this->fetchStream->getResponse()->getBody()->getContent();
-            if (($this->fetchStream->getResponse()->hasHeader('Content-Type')) &&
-                (count($this->fetchStream->getResponse()->getHeader('Content-Type')->getValues()) == 1)) {
-                if ($this->fetchStream->getResponse()->getHeader('Content-Type')->getValue(0) == 'application/json') {
-                    $resultResponse = json_decode($resultResponse, true);
-                } else if ($this->fetchStream->getResponse()->getHeader('Content-Type')->getValue(0) == 'application/x-www-form-urlencoded') {
-                    parse_str($resultResponse, $resultResponse);
-                }
-            }
+        if (($this->fetchClient->hasResponse()) && ($this->fetchClient->getResponse()->hasBody())) {
+            $resultResponse = $this->fetchClient->getResponse()->getParsedResponse();
         }
 
         return $resultResponse;
@@ -127,32 +119,30 @@ class Http extends AbstractAdapter
     /**
      * Determine if the adapter has a fetch stream
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasFetchStream()
+    public function hasFetchClient(): bool
     {
-        return (null !== $this->fetchStream);
+        return ($this->fetchClient !== null);
     }
 
     /**
      * Send the results of the audit
      *
-     * @throws Exception
-     * @return Stream
+     * @throws Exception|Client\Exception|Client\Handler\Exception|\Pop\Http\Exception
+     * @return Client\Response
      */
-    public function send()
+    public function send(): Client\Response
     {
-        if (null === $this->action) {
+        if ($this->action === null) {
             throw new Exception('The model state differences have not been resolved.');
         }
-        if ((null === $this->model) || (null === $this->modelId)) {
+        if (($this->model === null) || ($this->modelId === null)) {
             throw new Exception('The model has not been set.');
         }
 
-        $this->sendStream->setFields($this->prepareData());
-        $this->sendStream->send();
-
-        return $this->sendStream;
+        $this->sendClient->setData($this->prepareData());
+        return $this->sendClient->send();
     }
 
     /**
@@ -161,44 +151,46 @@ class Http extends AbstractAdapter
      * @param  array $fields
      * @return array
      */
-    public function getStates(array $fields = [])
+    public function getStates(array $fields = []): array
     {
         if (!empty($fields)) {
-            $this->fetchStream->setFields($fields);
+            $this->fetchClient->setData($fields);
         }
-        $this->fetchStream->send();
+        $this->fetchClient->send();
 
-        return $this->getFetchedResult();
+        $results = $this->getFetchedResult();
+
+        return (is_array($results)) ? $results : [];
     }
 
     /**
      * Get model state by ID
      *
-     * @param  int     $id
-     * @param  boolean $asQuery
+     * @param  int|string $id
+     * @param  bool       $asQuery
      * @return array
      */
-    public function getStateById($id, $asQuery = false)
+    public function getStateById(int|string $id, bool $asQuery = false): array
     {
-        $origUrl = $this->fetchStream->getUrl();
+        $origUrl = $this->fetchClient->getRequest()->getUriString();
 
         if ($asQuery) {
-            $this->fetchStream->setField('id', $id);
+            $this->fetchClient->addData('id', $id);
         } else {
-            $this->fetchStream->setUrl($origUrl . '/' . $id);
+            $this->fetchClient->getRequest()->getUri()->setUri($origUrl . '/' . $id);
         }
 
-        $this->fetchStream->send();
+        $this->fetchClient->send();
         $result = $this->getFetchedResult();
 
-        if (!empty($result['old'])) {
+        if (is_array($result) && !empty($result['old'])) {
             $result['old'] = json_decode($result['old'], true);
         }
-        if (!empty($result['new'])) {
+        if (is_array($result) && !empty($result['new'])) {
             $result['new'] = json_decode($result['new'], true);
         }
 
-        $this->fetchStream->setUrl($origUrl);
+        $this->fetchClient->getRequest()->getUri()->setUri($origUrl);
 
         return $result;
     }
@@ -206,11 +198,11 @@ class Http extends AbstractAdapter
     /**
      * Get model state by model
      *
-     * @param  string $model
-     * @param  int    $modelId
+     * @param  string          $model
+     * @param  int|string|null $modelId
      * @return array
      */
-    public function getStateByModel($model, $modelId = null)
+    public function getStateByModel(string $model, int|string|null $modelId = null): array
     {
         $fields = [
             'filter' => [
@@ -218,28 +210,30 @@ class Http extends AbstractAdapter
             ]
         ];
 
-        if (null !== $modelId) {
+        if ($modelId !== null) {
             $fields['filter'][] = 'model_id = ' . $modelId;
         }
 
-        $this->fetchStream->setFields($fields);
-        $this->fetchStream->send();
+        $this->fetchClient->setData($fields);
+        $this->fetchClient->send();
 
-        return $this->getFetchedResult();
+        $results = $this->getFetchedResult();
+
+        return (is_array($results)) ? $results : [];
     }
 
     /**
      * Get model state by timestamp
      *
-     * @param  string $from
-     * @param  string $backTo
+     * @param  string  $from
+     * @param  ?string $backTo
      * @return array
      */
-    public function getStateByTimestamp($from, $backTo = null)
+    public function getStateByTimestamp(string $from, ?string $backTo = null): array
     {
         $from = date('Y-m-d H:i:s', $from);
 
-        if (null !== $backTo) {
+        if ($backTo !== null) {
             $backTo = date('Y-m-d H:i:s', $backTo);
         }
 
@@ -249,31 +243,33 @@ class Http extends AbstractAdapter
             ]
         ];
 
-        if (null !== $backTo) {
+        if ($backTo !== null) {
             $fields['filter'][] = 'timestamp >= ' . $backTo;
         }
 
-        $this->fetchStream->setFields($fields);
-        $this->fetchStream->send();
+        $this->fetchClient->setData($fields);
+        $this->fetchClient->send();
 
-        return $this->getFetchedResult();
+        $results = $this->getFetchedResult();
+
+        return (is_array($results)) ? $results : [];
     }
 
     /**
      * Get model state by date
      *
-     * @param  string $from
-     * @param  string $backTo
+     * @param  string  $from
+     * @param  ?string $backTo
      * @return array
      */
-    public function getStateByDate($from, $backTo = null)
+    public function getStateByDate(string $from, ?string $backTo = null): array
     {
-        if (strpos($from, ' ') === false) {
+        if (!str_contains($from, ' ')) {
             $from .= ' 23:59:59';
         }
 
-        if (null !== $backTo) {
-            if (strpos($backTo, ' ') === false) {
+        if ($backTo !== null) {
+            if (!str_contains($backTo, ' ')) {
                 $backTo .= ' 00:00:00';
             }
         }
@@ -284,35 +280,37 @@ class Http extends AbstractAdapter
             ]
         ];
 
-        if (null !== $backTo) {
+        if ($backTo !== null) {
             $fields['filter'][] = 'timestamp >= ' . $backTo;
         }
 
-        $this->fetchStream->setFields($fields);
-        $this->fetchStream->send();
+        $this->fetchClient->setData($fields);
+        $this->fetchClient->send();
 
-        return $this->getFetchedResult();
+        $results = $this->getFetchedResult();
+
+        return (is_array($results)) ? $results : [];
     }
 
     /**
      * Get model snapshot by ID
      *
-     * @param  int     $id
-     * @param  boolean $post
+     * @param  int|string $id
+     * @param  bool       $post
      * @return array
      */
-    public function getSnapshot($id, $post = false)
+    public function getSnapshot(int|string $id, bool $post = false): array
     {
-        $url = $this->fetchStream->getUrl();
-        $this->fetchStream->setUrl($url . '/' . $id);
-        $this->fetchStream->send();
+        $url = $this->fetchClient->getRequest()->getUriString();;
+        $this->fetchClient->getRequest()->getUri()->setUri($url . '/' . $id);
+        $this->fetchClient->send();
 
         $result = $this->getFetchedResult();
 
-        if (!empty($result['old'])) {
+        if (is_array($result) && !empty($result['old'])) {
             $result['old'] = json_decode($result['old'], true);
         }
-        if (!empty($result['new'])) {
+        if (is_array($result) && !empty($result['new'])) {
             $result['new'] = json_decode($result['new'], true);
         }
 
@@ -324,7 +322,7 @@ class Http extends AbstractAdapter
             $snapshot = $result['new'];
         }
 
-        $this->fetchStream->setUrl($url);
+        $this->fetchClient->getRequest()->getUri()->setUri($url);
 
         return $snapshot;
     }

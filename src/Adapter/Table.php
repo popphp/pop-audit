@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -13,24 +13,26 @@
  */
 namespace Pop\Audit\Adapter;
 
+use Pop\Db\Record;
+
 /**
  * Auditor table class
  *
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    1.3.2
+ * @version    2.0.0
  */
 class Table extends AbstractAdapter
 {
 
     /**
      * Table class name
-     * @var string
+     * @var ?string
      */
-    protected $table = null;
+    protected ?string $table = null;
 
     /**
      * Constructor
@@ -39,7 +41,7 @@ class Table extends AbstractAdapter
      *
      * @param  string $table
      */
-    public function __construct($table)
+    public function __construct(string $table)
     {
         $this->setTable($table);
         $db        = call_user_func($this->table . '::getDb');
@@ -56,7 +58,7 @@ class Table extends AbstractAdapter
      * @param  string $table
      * @return Table
      */
-    public function setTable($table)
+    public function setTable(string $table): Table
     {
         $this->table = $table;
         return $this;
@@ -67,7 +69,7 @@ class Table extends AbstractAdapter
      *
      * @return string
      */
-    public function getTable()
+    public function getTable(): string
     {
         return $this->table;
     }
@@ -76,14 +78,14 @@ class Table extends AbstractAdapter
      * Send the results of the audit
      *
      * @throws Exception
-     * @return \Pop\Db\Record
+     * @return Record
      */
-    public function send()
+    public function send(): Record
     {
-        if (null === $this->action) {
+        if ($this->action === null) {
             throw new Exception('The model state differences have not been resolved.');
         }
-        if ((null === $this->model) || (null === $this->modelId)) {
+        if (($this->model === null) || ($this->modelId === null)) {
             throw new Exception('The model has not been set.');
         }
 
@@ -97,13 +99,13 @@ class Table extends AbstractAdapter
     /**
      * Get model states
      *
-     * @param  array $columns
-     * @param  array $options
+     * @param  ?array $columns
+     * @param  ?array $options
      * @return array
      */
-    public function getStates(array $columns = null, array $options = null)
+    public function getStates(?array $columns = null, ?array $options = null): array
     {
-        if (null !== $columns) {
+        if ($columns !== null) {
             $result = call_user_func_array($this->table . '::findBy', ['columns' => $columns, 'options' => $options]);
         } else {
             $result = call_user_func_array($this->table . '::findAll', ['options' => $options]);
@@ -115,10 +117,10 @@ class Table extends AbstractAdapter
     /**
      * Get model state by ID
      *
-     * @param  int $id
+     * @param  int|string $id
      * @return array
      */
-    public function getStateById($id)
+    public function getStateById(int|string $id): array
     {
         $record = call_user_func_array($this->table . '::findById', ['id' => $id]);
         $result = $record->toArray();
@@ -136,15 +138,15 @@ class Table extends AbstractAdapter
     /**
      * Get model state by model
      *
-     * @param  string $model
-     * @param  int    $modelId
-     * @param  array  $columns
+     * @param  string          $model
+     * @param  int|string|null $modelId
+     * @param  array           $columns
      * @return array
      */
-    public function getStateByModel($model, $modelId = null, array $columns = [])
+    public function getStateByModel(string $model, int|string|null $modelId = null, array $columns = []): array
     {
         $columns['model']    = $model;
-        if (null !== $modelId) {
+        if ($modelId !== null) {
             $columns['model_id'] = $modelId;
         }
         $result = call_user_func_array($this->table . '::findBy', [$columns]);
@@ -154,15 +156,15 @@ class Table extends AbstractAdapter
     /**
      * Get model state by timestamp
      *
-     * @param  string $from
-     * @param  string $backTo
-     * @param  array  $columns
+     * @param  string  $from
+     * @param  ?string $backTo
+     * @param  array   $columns
      * @return array
      */
-    public function getStateByTimestamp($from, $backTo = null, array $columns = [])
+    public function getStateByTimestamp(string $from, ?string $backTo = null, array $columns = []): array
     {
         $columns['timestamp<='] = date('Y-m-d H:i:s', $from);
-        if (null !== $backTo) {
+        if ($backTo !== null) {
             $columns['timestamp>='] = date('Y-m-d H:i:s', $backTo);
         }
         $result = call_user_func_array($this->table . '::findBy', [$columns]);
@@ -172,19 +174,19 @@ class Table extends AbstractAdapter
     /**
      * Get model state by date
      *
-     * @param  string $from
-     * @param  string $backTo
-     * @param  array  $columns
+     * @param  string  $from
+     * @param  ?string $backTo
+     * @param  array   $columns
      * @return array
      */
-    public function getStateByDate($from, $backTo = null, array $columns = [])
+    public function getStateByDate(string $from, ?string $backTo = null, array $columns = []): array
     {
-        if (strpos($from, ' ') === false) {
+        if (!str_contains($from, ' ')) {
             $from .= ' 23:59:59';
         }
         $columns['timestamp<='] = $from;
-        if (null !== $backTo) {
-            if (strpos($backTo, ' ') === false) {
+        if ($backTo !== null) {
+            if (!str_contains($backTo, ' ')) {
                 $backTo .= ' 00:00:00';
             }
             $columns['timestamp>='] = $backTo;
@@ -196,11 +198,11 @@ class Table extends AbstractAdapter
     /**
      * Get model snapshot by ID
      *
-     * @param  int     $id
-     * @param  boolean $post
+     * @param  int|string $id
+     * @param  bool       $post
      * @return array
      */
-    public function getSnapshot($id, $post = false)
+    public function getSnapshot(int|string $id, bool $post = false): array
     {
         $result   = call_user_func_array($this->table . '::findById', ['id' => $id]);
         $snapshot = [];
@@ -220,7 +222,7 @@ class Table extends AbstractAdapter
      * @param  string $tableName
      * @return void
      */
-    protected function createTable($tableName)
+    protected function createTable(string $tableName): void
     {
         $db     = call_user_func($this->table . '::getDb');
         $schema = $db->createSchema();

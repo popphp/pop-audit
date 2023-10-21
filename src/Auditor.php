@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -21,18 +21,18 @@ use Pop\Audit\Adapter\AdapterInterface;
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    1.3.2
+ * @version    2.0.0
  */
 class Auditor
 {
 
     /**
      * Auditor adapter
-     * @var AdapterInterface
+     * @var ?AdapterInterface
      */
-    protected $adapter = null;
+    protected ?AdapterInterface $adapter = null;
 
     /**
      * Constructor
@@ -49,9 +49,9 @@ class Auditor
     /**
      * Get the adapter
      *
-     * @return mixed
+     * @return AdapterInterface
      */
-    public function adapter()
+    public function adapter(): AdapterInterface
     {
         return $this->adapter;
     }
@@ -59,16 +59,16 @@ class Auditor
     /**
      * Set user
      *
-     * @param  string  $model
-     * @param  int     $modelId
+     * @param  ?string $model
+     * @param  ?int    $modelId
      * @return Auditor
      */
-    public function setModel($model = null, $modelId = null)
+    public function setModel(?string $model = null, ?int $modelId = null): Auditor
     {
-        if (null !== $model) {
+        if ($model !== null) {
             $this->adapter->setModel($model);
         }
-        if (null !== $modelId) {
+        if ($modelId !== null) {
             $this->adapter->setModelId($modelId);
         }
 
@@ -78,16 +78,16 @@ class Auditor
     /**
      * Set user
      *
-     * @param  string  $username
-     * @param  int     $userId
+     * @param  ?string $username
+     * @param  ?int    $userId
      * @return Auditor
      */
-    public function setUser($username = null, $userId = null)
+    public function setUser(?string $username = null, ?int $userId = null): Auditor
     {
-        if (null !== $username) {
+        if ($username !== null) {
             $this->adapter->setUsername($username);
         }
-        if (null !== $userId) {
+        if ($userId !== null) {
             $this->adapter->setUserId($userId);
         }
 
@@ -97,20 +97,20 @@ class Auditor
     /**
      * Set domain, route and method
      *
-     * @param  string  $domain
-     * @param  string  $route
-     * @param  string  $method
+     * @param  ?string $domain
+     * @param  ?string $route
+     * @param  ?string $method
      * @return Auditor
      */
-    public function setDomain($domain = null, $route = null, $method = null)
+    public function setDomain(?string $domain = null, ?string $route = null, ?string $method = null): Auditor
     {
-        if (null !== $domain) {
+        if ($domain !== null) {
             $this->adapter->setDomain($domain);
         }
-        if (null !== $route) {
+        if ($route !== null) {
             $this->adapter->setRoute($route);
         }
-        if (null !== $method) {
+        if ($method !== null) {
             $this->adapter->setMethod($method);
         }
 
@@ -123,7 +123,7 @@ class Auditor
      * @param  array $metadata
      * @return Auditor
      */
-    public function setMetadata(array $metadata)
+    public function setMetadata(array $metadata): Auditor
     {
         $this->adapter->setMetadata($metadata);
         return $this;
@@ -136,7 +136,7 @@ class Auditor
      * @param  mixed $value
      * @return Auditor
      */
-    public function addMetadata($name, $value)
+    public function addMetadata(string $name, mixed $value): Auditor
     {
         $this->adapter->addMetadata($name, $value);
         return $this;
@@ -148,7 +148,7 @@ class Auditor
      * @param  array $stateData
      * @return Auditor
      */
-    public function setStateData(array $stateData)
+    public function setStateData(array $stateData): Auditor
     {
         $this->adapter->setStateData($stateData);
         return $this;
@@ -157,10 +157,10 @@ class Auditor
     /**
      * Get state data
      *
-     * @param  string $name
+     * @param  ?string $name
      * @return mixed
      */
-    public function getStateData($name = null)
+    public function getStateData(?string $name = null): mixed
     {
         return $this->adapter->getStateData($name);
     }
@@ -168,10 +168,10 @@ class Auditor
     /**
      * Has state data
      *
-     * @param  string $name
-     * @return boolean
+     * @param  ?string $name
+     * @return bool
      */
-    public function hasStateData($name = null)
+    public function hasStateData(?string $name = null): bool
     {
         return $this->adapter->hasStateData($name);
     }
@@ -181,9 +181,9 @@ class Auditor
      *
      * @param  array $old
      * @param  array $new
-     * @return self
+     * @return Auditor
      */
-    public function setDiff(array $old = [], array $new = [])
+    public function setDiff(array $old = [], array $new = []): Auditor
     {
         $this->adapter->setDiff($old, $new);
         return $this;
@@ -194,9 +194,9 @@ class Auditor
      *
      * @param  array $old
      * @param  array $new
-     * @return self
+     * @return Auditor
      */
-    public function resolveDiff(array $old = [], array $new = [])
+    public function resolveDiff(array $old = [], array $new = []): Auditor
     {
         $this->adapter->resolveDiff($old, $new);
         return $this;
@@ -205,9 +205,9 @@ class Auditor
     /**
      * Check if the model states are different
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasDiff()
+    public function hasDiff(): bool
     {
         return $this->adapter->hasDiff();
     }
@@ -215,17 +215,17 @@ class Auditor
     /**
      * Send the results of the audit
      *
-     * @param  array $old
-     * @param  array $new
-     * @param  array $state
+     * @param  ?array $old
+     * @param  ?array $new
+     * @param  ?array $state
      * @return mixed
      */
-    public function send(array $old = null, array $new = null, array $state = null)
+    public function send(array $old = null, array $new = null, array $state = null): mixed
     {
-        if ((null !== $old) && (null !== $new)) {
+        if (($old !== null) && ($new !== null)) {
             $this->adapter->resolveDiff($old, $new);
         }
-        if (null !== $state) {
+        if ($state !== null) {
             $this->adapter->setStateData($state);
         }
 

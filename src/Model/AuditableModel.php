@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -22,26 +22,26 @@ use Pop\Model\AbstractModel;
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    1.3.2
+ * @version    2.0.0
  */
 abstract class AuditableModel extends AbstractModel implements AuditableInterface
 {
 
     /**
      * Auditor object
-     * @var Auditor
+     * @var ?Auditor
      */
-    protected $auditor = null;
+    protected ?Auditor $auditor = null;
 
     /**
      * Set the auditor object
      *
      * @param  Auditor $auditor
-     * @return self
+     * @return AuditableModel
      */
-    public function setAuditor(Auditor $auditor)
+    public function setAuditor(Auditor $auditor): AuditableModel
     {
         $this->auditor = $auditor;
         return $this;
@@ -50,9 +50,9 @@ abstract class AuditableModel extends AbstractModel implements AuditableInterfac
     /**
      * Get the auditor object
      *
-     * @return Auditor
+     * @return Auditor|null
      */
-    public function getAuditor()
+    public function getAuditor(): Auditor|null
     {
         return $this->auditor;
     }
@@ -60,21 +60,21 @@ abstract class AuditableModel extends AbstractModel implements AuditableInterfac
     /**
      * Determine if the model has auditor
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasAuditor()
+    public function hasAuditor(): bool
     {
-        return (null !== $this->auditor);
+        return ($this->auditor !== null);
     }
 
     /**
      * Determine if the model is auditable
      *
-     * @return boolean
+     * @return bool
      */
-    public function isAuditable()
+    public function isAuditable(): bool
     {
-        return (null !== $this->auditor);
+        return ($this->auditor !== null);
     }
 
 }

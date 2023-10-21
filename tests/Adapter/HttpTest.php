@@ -4,17 +4,17 @@ namespace Pop\Audit\Test\Adapter;
 
 use PHPUnit\Framework\TestCase;
 use Pop\Audit\Adapter;
-use Pop\Http\Client\Stream;
+use Pop\Http\Client;
 
 class HttpTest extends TestCase
 {
 
     public function testConstructor()
     {
-        $adapter = new Adapter\Http(new Stream('http://localhost/'), new Stream('http://localhost/'));
+        $adapter = new Adapter\Http(new Client('http://localhost/'), new Client('http://localhost/'));
         $this->assertInstanceOf('Pop\Audit\Adapter\Http', $adapter);
-        $this->assertInstanceOf('Pop\Http\Client\Stream', $adapter->getSendStream());
-        $this->assertInstanceOf('Pop\Http\Client\Stream', $adapter->getFetchStream());
+        $this->assertInstanceOf('Pop\Http\Client', $adapter->getSendClient());
+        $this->assertInstanceOf('Pop\Http\Client', $adapter->getFetchClient());
     }
 
     public function testSend()
@@ -22,7 +22,7 @@ class HttpTest extends TestCase
         $old = ['username' => 'admin'];
         $new = ['username' => 'admin2'];
 
-        $adapter = new Adapter\Http(new Stream('http://localhost/'), new Stream('http://localhost/'));
+        $adapter = new Adapter\Http(new Client('http://localhost/'), new Client('http://localhost/'));
         $adapter->setModel('MyApp\Model\User');
         $adapter->setModelId(1001);
         $adapter->resolveDiff($old, $new);
@@ -30,9 +30,6 @@ class HttpTest extends TestCase
 
         $states = $adapter->getStates(['filter' => 'timestamp >=' . date('Y-m-d')]);
         $this->assertNotNull($states);
-
-        $state = $adapter->getStateById(null);
-        $this->assertNotNull($state);
 
         $states = $adapter->getStateByModel('MyApp\Model\User', 1001);
         $this->assertNotNull($states);
@@ -43,18 +40,15 @@ class HttpTest extends TestCase
         $states = $adapter->getStateByDate(date('Y-m-d'), date('Y-m-d', time() - 1000));
         $this->assertNotNull($states);
 
-        $snapshot = $adapter->getSnapshot(null);
-        $this->assertEquals(0, count($snapshot));
+        $this->assertTrue($adapter->hasFetchClient());
 
-        $this->assertTrue($adapter->hasFetchStream());
-
-        $this->assertInstanceOf('Pop\Http\Client\Stream', $result);
+        $this->assertInstanceOf('Pop\Http\Client\Response', $adapter->getFetchClient()->getResponse());
     }
 
     public function testSendException()
     {
         $this->expectException('Pop\Audit\Adapter\Exception');
-        $adapter = new Adapter\Http(new Stream('http://localhost/'));
+        $adapter = new Adapter\Http(new Client('http://localhost/'));
         $adapter->send();
     }
 
@@ -64,7 +58,7 @@ class HttpTest extends TestCase
         $old = ['username' => 'admin'];
         $new = ['username' => 'admin2'];
 
-        $adapter = new Adapter\Http(new Stream('http://localhost/'));
+        $adapter = new Adapter\Http(new Client('http://localhost/'));
         $adapter->resolveDiff($old, $new);
         $adapter->send();
     }
