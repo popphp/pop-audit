@@ -59,7 +59,7 @@ $state = [
 
 $auditor = new Auditor(new File('tmp'));       // Folder passed to the File adapter
 $auditor->setModel('MyApp\Model\User', 1001);  // Model name and model ID
-$auditor->setUser('testuser', 101);            // Username and user ID that made the change (optional)
+$auditor->setUser('testuser', 101);            // Username/ID that made the change (optional)
 $auditor->setDomain('users.localhost');        // Domain (optional)
 $logFile = $auditor->send($old, $new, $state);
 ```
