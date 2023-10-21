@@ -35,7 +35,8 @@ With the file adapter, you set the folder you want to save the audit record to,
 and save the model state changes like this:
 
 ```php
-use Pop\Audit;
+use Pop\Audit\Auditor;
+use Pop\Audit\Adapter\File;
 
 $old = [
     'username' => 'admin',
@@ -56,10 +57,10 @@ $state = [
     "email"      => "test@test.com"
 ];
 
-$auditor = new Audit\Auditor(new Audit\Adapter\File('tmp'));  // Folder passed to the File adapter
-$auditor->setModel('MyApp\Model\User', 1001);                 // Model name and model ID
-$auditor->setUser('testuser', 101);                           // Username and user ID that made the change (optional)
-$auditor->setDomain('users.localhost');                       // Domain (optional)
+$auditor = new Auditor(new File('tmp'));       // Folder passed to the File adapter
+$auditor->setModel('MyApp\Model\User', 1001);  // Model name and model ID
+$auditor->setUser('testuser', 101);            // Username and user ID that made the change (optional)
+$auditor->setDomain('users.localhost');        // Domain (optional)
 $logFile = $auditor->send($old, $new, $state);
 ```
 
@@ -147,7 +148,10 @@ If needed, the variable `$row` contains the newly created record in the audit ta
 You can also send your audit data to an HTTP service like this:
 
 ```php
-use Pop\Audit;
+use Pop\Http\Client;
+use Pop\Http\Auth;
+use Pop\Audit\Auditor;
+use Pop\Audit\Adapter\Http;
 
 $old = [
     'username'   => 'admin',
@@ -168,14 +172,13 @@ $state = [
     "email"      => "test@test.com"
 ];
 
-$stream = new \Pop\Http\Client\Stream('http://audit.localhost');
-$stream->setContextOptions(['http' => [
-    'protocol_version' => '1.1',
-    'method'           => 'POST',
-    'header'           => 'Authorization: Bearer my-auth-token'
-]]);
+$client = new Client(
+    'http://audit.localhost',
+    Auth::createBearer('AUTH_TOKEN'),
+    ['method' => 'POST']
+);
 
-$auditor = new Audit\Auditor(new Audit\Adapter\Http($stream));
+$auditor = new Auditor(new Http($stream));
 $auditor->setModel('MyApp\Model\User', 1001);
 $auditor->setUser('testuser', 101);
 $auditor->setDomain('users.localhost');
@@ -190,7 +193,8 @@ In the examples above, the auditor object handled the "diffing." If you want to 
 values that have already been evaluated, you can do that like this:
 
 ```php
-use Pop\Audit;
+use Pop\Audit\Auditor;
+use Pop\Audit\Adapter\File;
 
 $old = [
     'username' => 'admin'
