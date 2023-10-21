@@ -59,6 +59,8 @@ class AuditorTest extends TestCase
         $this->assertTrue($auditor->adapter()->hasStateData('foo'));
         $this->assertFalse($auditor->adapter()->hasStateData('baz'));
         $this->assertEquals('bar', $auditor->adapter()->getStateData('foo'));
+        $this->assertFalse($auditor->hasStateData('baz'));
+        $this->assertEquals('bar', $auditor->getStateData('foo'));
         $this->assertEquals(['foo' => 'bar'], $auditor->adapter()->getStateData());
     }
 
@@ -86,12 +88,13 @@ class AuditorTest extends TestCase
 
     public function testSend()
     {
-        $old = ['username' => 'admin'];
-        $new = ['username' => 'admin2'];
+        $old   = ['username' => 'admin'];
+        $new   = ['username' => 'admin2'];
+        $state = ['id' => 1, 'username' => 'admin2', 'email' => 'test@test.com'];
 
         $auditor  = new Audit\Auditor(new Audit\Adapter\File(__DIR__ . '/tmp'));
         $auditor->setModel('MyApp\Model\User', 1001);
-        $fileName = $auditor->send($old, $new);
+        $fileName = $auditor->send($old, $new, $state);
 
         $this->assertFileExists(__DIR__ . '/tmp/' . $fileName);
         unlink(__DIR__ . '/tmp/' . $fileName);

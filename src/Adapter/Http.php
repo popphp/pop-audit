@@ -172,7 +172,7 @@ class Http extends AbstractAdapter
      */
     public function getStateById(int|string $id, bool $asQuery = false): array
     {
-        $origUrl = $this->fetchClient->getRequest()->getUriString();
+        $origUrl = $this->fetchClient->getRequest()->getUri()->getFullUri();
 
         if ($asQuery) {
             $this->fetchClient->addData('id', $id);
@@ -181,13 +181,19 @@ class Http extends AbstractAdapter
         }
 
         $this->fetchClient->send();
-        $result = $this->getFetchedResult();
+        $parsedResult = $this->getFetchedResult();
 
-        if (is_array($result) && !empty($result['old'])) {
-            $result['old'] = json_decode($result['old'], true);
+        $result = (is_array($parsedResult)) ? $parsedResult : [$parsedResult];
+
+        if (is_array($result) && !empty($result['old']) && is_string($result['old'])) {
+            if ((json_decode($result['old']) !== false) && (json_last_error() == JSON_ERROR_NONE)) {
+                $result['old'] = json_decode($result['old'], true);
+            }
         }
-        if (is_array($result) && !empty($result['new'])) {
-            $result['new'] = json_decode($result['new'], true);
+        if (is_array($result) && !empty($result['new']) && is_string($result['new'])) {
+            if ((json_decode($result['new']) !== false) && (json_last_error() == JSON_ERROR_NONE)) {
+                $result['new'] = json_decode($result['new'], true);
+            }
         }
 
         $this->fetchClient->getRequest()->getUri()->setUri($origUrl);
@@ -301,17 +307,23 @@ class Http extends AbstractAdapter
      */
     public function getSnapshot(int|string $id, bool $post = false): array
     {
-        $url = $this->fetchClient->getRequest()->getUriString();;
+        $url = $this->fetchClient->getRequest()->getUri()->getFullUri();
         $this->fetchClient->getRequest()->getUri()->setUri($url . '/' . $id);
         $this->fetchClient->send();
 
-        $result = $this->getFetchedResult();
+        $parsedResult = $this->getFetchedResult();
 
-        if (is_array($result) && !empty($result['old'])) {
-            $result['old'] = json_decode($result['old'], true);
+        $result = (is_array($parsedResult)) ? $parsedResult : [$parsedResult];
+
+        if (is_array($result) && !empty($result['old']) && is_string($result['old'])) {
+            if ((json_decode($result['old']) !== false) && (json_last_error() == JSON_ERROR_NONE)) {
+                $result['old'] = json_decode($result['old'], true);
+            }
         }
-        if (is_array($result) && !empty($result['new'])) {
-            $result['new'] = json_decode($result['new'], true);
+        if (is_array($result) && !empty($result['new']) && is_string($result['new'])) {
+            if ((json_decode($result['new']) !== false) && (json_last_error() == JSON_ERROR_NONE)) {
+                $result['new'] = json_decode($result['new'], true);
+            }
         }
 
         $snapshot = [];

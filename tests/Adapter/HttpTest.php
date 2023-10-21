@@ -31,6 +31,9 @@ class HttpTest extends TestCase
         $states = $adapter->getStates(['filter' => 'timestamp >=' . date('Y-m-d')]);
         $this->assertNotNull($states);
 
+        $states = $adapter->getStateById(1001);
+        $this->assertNotNull($states);
+
         $states = $adapter->getStateByModel('MyApp\Model\User', 1001);
         $this->assertNotNull($states);
 
@@ -38,6 +41,9 @@ class HttpTest extends TestCase
         $this->assertNotNull($states);
 
         $states = $adapter->getStateByDate(date('Y-m-d'), date('Y-m-d', time() - 1000));
+        $this->assertNotNull($states);
+
+        $states = $adapter->getSnapshot(1001);
         $this->assertNotNull($states);
 
         $this->assertTrue($adapter->hasFetchClient());

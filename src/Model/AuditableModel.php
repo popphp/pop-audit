@@ -68,7 +68,7 @@ abstract class AuditableModel extends AbstractModel implements AuditableInterfac
     }
 
     /**
-     * Determine if the model is auditable
+     * Determine if the model is auditable (alias)
      *
      * @return bool
      */
