@@ -90,6 +90,8 @@ $new = [
 $auditor->send($old, $new);
 ```
 
+[Top](#pop-audit)
+
 ### Retrieving Changes
 
 Interacting with the auditor's adapter, the previously stored model states can be retrieved:
@@ -197,8 +199,8 @@ the auditor.
 
 [Top](#pop-audit)
 
-Files
------
+Using Files
+-----------
 
 With the file adapter, you set the folder you want to save the audit record to,
 and save the model state changes like this:
@@ -260,8 +262,8 @@ the model states, as well as a snapshot of the full state (if provided):
 
 [Top](#pop-audit)
 
-Database
---------
+Using a Database
+----------------
 
 Using a database connection requires the use of the `pop-db` component and a database table class
 that extends the `Pop\Db\Record` class. Consider a database and table class set up in your
@@ -306,8 +308,8 @@ If needed, the variable `$row` contains the newly created record in the audit ta
 
 [Top](#pop-audit)
 
-HTTP
-----
+Using HTTP
+----------
 
 You can also send your audit data to an HTTP service like this:
 
