@@ -13,9 +13,9 @@ pop-audit
   - [Storing Changes](#storing-changes)
   - [Retrieving Changes](#retrieving-changes)
 * [Diffing](#diffing)
-* [Files](#files)
-* [Database](#database)
-* [HTTP](#http)
+* [Using Files](#using-files)
+* [Using a Database](#using-a-database)
+* [Using HTTP](#using-http)
 
 Overview
 --------
