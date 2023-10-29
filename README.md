@@ -193,7 +193,7 @@ $auditor->send();
 ```
 
 An example of this is the `Pop\Db\Record` class from the `pop-db` component. It automatically tracks the
-"dirty" values that have been changed while working with a record object. You can then be used the `getDirty()`
+"dirty" values that have been changed while working with a record object. You can then used the `getDirty()`
 method of the `Pop\Db\Record` class to return an array with the keys `old` and `new` and pass them off to
 the auditor.
 
