@@ -411,10 +411,14 @@ abstract class AbstractAdapter implements AdapterInterface
      *
      * @param  array $old
      * @param  array $new
+     * @param  bool  $state
      * @return AbstractAdapter
      */
-    public function resolveDiff(array $old = [], array $new = []): AbstractAdapter
+    public function resolveDiff(array $old = [], array $new = [], bool $state = true): AbstractAdapter
     {
+        if ($state) {
+            $this->setStateData($new);
+        }
         if (empty($old) && !empty($new)) {
             $this->modified = $new;
             $this->action   = AbstractAdapter::CREATED;

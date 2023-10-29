@@ -194,11 +194,12 @@ class Auditor
      *
      * @param  array $old
      * @param  array $new
+     * @param  bool  $state
      * @return Auditor
      */
-    public function resolveDiff(array $old = [], array $new = []): Auditor
+    public function resolveDiff(array $old = [], array $new = [], bool $state = true): Auditor
     {
-        $this->adapter->resolveDiff($old, $new);
+        $this->adapter->resolveDiff($old, $new, $state);
         return $this;
     }
 
@@ -217,16 +218,13 @@ class Auditor
      *
      * @param  ?array $old
      * @param  ?array $new
-     * @param  ?array $state
+     * @param  bool $state
      * @return mixed
      */
-    public function send(array $old = null, array $new = null, array $state = null): mixed
+    public function send(array $old = null, array $new = null, bool $state = true): mixed
     {
         if (($old !== null) && ($new !== null)) {
-            $this->adapter->resolveDiff($old, $new);
-        }
-        if ($state !== null) {
-            $this->adapter->setStateData($state);
+            $this->adapter->resolveDiff($old, $new, $state);
         }
 
         return ($this->adapter->hasDiff()) ? $this->adapter->send() : false;

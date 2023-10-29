@@ -94,7 +94,7 @@ class AuditorTest extends TestCase
 
         $auditor  = new Audit\Auditor(new Audit\Adapter\File(__DIR__ . '/tmp'));
         $auditor->setModel('MyApp\Model\User', 1001);
-        $fileName = $auditor->send($old, $new, $state);
+        $fileName = $auditor->send($old, $new);
 
         $this->assertFileExists(__DIR__ . '/tmp/' . $fileName);
         unlink(__DIR__ . '/tmp/' . $fileName);

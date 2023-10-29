@@ -222,9 +222,10 @@ interface AdapterInterface
      *
      * @param  array $old
      * @param  array $new
+     * @param  bool  $state
      * @return AdapterInterface
      */
-    public function resolveDiff(array $old, array $new): AdapterInterface;
+    public function resolveDiff(array $old, array $new, bool $state = true): AdapterInterface;
 
     /**
      * Check if the model states are different
