@@ -37,10 +37,10 @@ interface AdapterInterface
     /**
      * Set the model ID
      *
-     * @param  int $modelId
+     * @param  int|string $modelId
      * @return AdapterInterface
      */
-    public function setModelId(int $modelId): AdapterInterface;
+    public function setModelId(int|string $modelId): AdapterInterface;
 
     /**
      * Get the model name

@@ -59,11 +59,11 @@ class Auditor
     /**
      * Set user
      *
-     * @param  ?string $model
-     * @param  ?int    $modelId
+     * @param  ?string         $model
+     * @param  int|string|null $modelId
      * @return Auditor
      */
-    public function setModel(?string $model = null, ?int $modelId = null): Auditor
+    public function setModel(?string $model = null, int|string|null $modelId = null): Auditor
     {
         if ($model !== null) {
             $this->adapter->setModel($model);
