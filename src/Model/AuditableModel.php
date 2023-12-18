@@ -14,7 +14,7 @@
 namespace Pop\Audit\Model;
 
 use Pop\Audit\Auditor;
-use Pop\Model\AbstractModel;
+use Pop\Model\AbstractDataModel;
 
 /**
  * Abstract auditable model class
@@ -26,7 +26,7 @@ use Pop\Model\AbstractModel;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0
  */
-abstract class AuditableModel extends AbstractModel implements AuditableInterface
+abstract class AuditableModel extends AbstractDataModel implements AuditableInterface
 {
 
     /**
