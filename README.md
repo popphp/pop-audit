@@ -40,7 +40,7 @@ Install `pop-audit` using Composer.
 Or, require it in your composer.json file
 
     "require": {
-        "popphp/pop-audit" : "^2.0.1"
+        "popphp/pop-audit" : "^2.0.2"
     }
 
 [Top](#pop-audit)

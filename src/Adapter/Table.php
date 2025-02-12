@@ -23,7 +23,7 @@ use Pop\Db\Record;
  * @author     Nick Sagona, III <dev@noladev.com>
  * @copyright  Copyright (c) 2009-2025 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    2.0.1
+ * @version    2.0.2
  */
 class Table extends AbstractAdapter
 {
