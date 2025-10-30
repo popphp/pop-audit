@@ -221,7 +221,7 @@ class Auditor
      * @param  bool $state
      * @return mixed
      */
-    public function send(array $old = null, array $new = null, bool $state = true): mixed
+    public function send(?array $old = null, ?array $new = null, bool $state = true): mixed
     {
         if (($old !== null) && ($new !== null)) {
             $this->adapter->resolveDiff($old, $new, $state);
