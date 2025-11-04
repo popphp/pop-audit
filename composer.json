@@ -23,7 +23,7 @@
     "require": {
         "php": ">=8.3.0",
         "popphp/popphp": "^4.4.0",
-        "popphp/pop-db": "^6.6.5",
+        "popphp/pop-db": "^6.7.0",
         "popphp/pop-http": "^5.3.8"
     },
     "require-dev": {
