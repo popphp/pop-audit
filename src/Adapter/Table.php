@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  */
 
@@ -21,9 +21,9 @@ use Pop\Db\Record;
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    2.0.3
+ * @version    3.0.0
  */
 class Table extends AbstractAdapter
 {
@@ -111,7 +111,7 @@ class Table extends AbstractAdapter
             $result = call_user_func_array($this->table . '::findAll', ['options' => $options]);
         }
 
-        return $result->toArray();
+        return array_map([$this, 'decodeState'], $result->toArray());
     }
 
     /**
@@ -123,16 +123,7 @@ class Table extends AbstractAdapter
     public function getStateById(int|string $id): array
     {
         $record = call_user_func_array($this->table . '::findById', ['id' => $id]);
-        $result = $record->toArray();
-
-        if (!empty($result['old'])) {
-            $result['old'] = json_decode($result['old'], true);
-        }
-        if (!empty($result['new'])) {
-            $result['new'] = json_decode($result['new'], true);
-        }
-
-        return $result;
+        return $this->decodeState($record->toArray());
     }
 
     /**
@@ -150,7 +141,7 @@ class Table extends AbstractAdapter
             $columns['model_id'] = $modelId;
         }
         $result = call_user_func_array($this->table . '::findBy', [$columns]);
-        return $result->toArray();
+        return array_map([$this, 'decodeState'], $result->toArray());
     }
 
     /**
@@ -163,12 +154,12 @@ class Table extends AbstractAdapter
      */
     public function getStateByTimestamp(string $from, ?string $backTo = null, array $columns = []): array
     {
-        $columns['timestamp<='] = date('Y-m-d H:i:s', $from);
-        if ($backTo !== null) {
-            $columns['timestamp>='] = date('Y-m-d H:i:s', $backTo);
-        }
+        $to = date('Y-m-d H:i:s', $from);
+        $columns['timestamp'] = ($backTo !== null) ?
+            ['BETWEEN', date('Y-m-d H:i:s', $backTo), $to] : ['<=', $to];
+
         $result = call_user_func_array($this->table . '::findBy', [$columns]);
-        return $result->toArray();
+        return array_map([$this, 'decodeState'], $result->toArray());
     }
 
     /**
@@ -184,15 +175,34 @@ class Table extends AbstractAdapter
         if (!str_contains($from, ' ')) {
             $from .= ' 23:59:59';
         }
-        $columns['timestamp<='] = $from;
         if ($backTo !== null) {
             if (!str_contains($backTo, ' ')) {
                 $backTo .= ' 00:00:00';
             }
-            $columns['timestamp>='] = $backTo;
+            $columns['timestamp'] = ['BETWEEN', $backTo, $from];
+        } else {
+            $columns['timestamp'] = ['<=', $from];
         }
         $result = call_user_func_array($this->table . '::findBy', [$columns]);
-        return $result->toArray();
+        return array_map([$this, 'decodeState'], $result->toArray());
+    }
+
+    /**
+     * Decode the JSON-encoded old/new state fields of a result row
+     *
+     * @param  array $result
+     * @return array
+     */
+    protected function decodeState(array $result): array
+    {
+        if (!empty($result['old']) && is_string($result['old'])) {
+            $result['old'] = json_decode($result['old'], true);
+        }
+        if (!empty($result['new']) && is_string($result['new'])) {
+            $result['new'] = json_decode($result['new'], true);
+        }
+
+        return $result;
     }
 
     /**

@@ -131,4 +131,51 @@ class AdapterTest extends TestCase
         $adapter->setDiff($old, $new);
         $this->assertEquals('deleted', $adapter->getAction());
     }
+
+    public function testResolveDiffResetsBetweenCalls()
+    {
+        $adapter = new Audit\Adapter\File(__DIR__ . '/tmp');
+        $adapter->resolveDiff(['username' => 'admin'], ['username' => 'admin2']);
+        $adapter->resolveDiff(['email' => 'old@test.com'], ['email' => 'new@test.com']);
+
+        $original = $adapter->getOriginal();
+        $modified = $adapter->getModified();
+
+        $this->assertArrayNotHasKey('username', $original);
+        $this->assertArrayNotHasKey('username', $modified);
+        $this->assertEquals('old@test.com', $original['email']);
+        $this->assertEquals('new@test.com', $modified['email']);
+    }
+
+    public function testResolveDiffDetectsChangeWhenOldValueMatchesAnotherField()
+    {
+        $old = ['status' => 'A', 'note' => 'A'];
+        $new = ['status' => 'B', 'note' => 'A'];
+
+        $adapter = new Audit\Adapter\File(__DIR__ . '/tmp');
+        $adapter->resolveDiff($old, $new);
+
+        $original = $adapter->getOriginal();
+        $modified = $adapter->getModified();
+
+        $this->assertArrayHasKey('status', $original);
+        $this->assertEquals('A', $original['status']);
+        $this->assertEquals('B', $modified['status']);
+        $this->assertArrayNotHasKey('note', $original);
+    }
+
+    public function testResolveDiffHandlesArrayValues()
+    {
+        $old = ['meta' => ['role' => 'user']];
+        $new = ['meta' => ['role' => 'admin']];
+
+        $adapter = new Audit\Adapter\File(__DIR__ . '/tmp');
+        $adapter->resolveDiff($old, $new);
+
+        $original = $adapter->getOriginal();
+        $modified = $adapter->getModified();
+
+        $this->assertEquals(['role' => 'user'], $original['meta']);
+        $this->assertEquals(['role' => 'admin'], $modified['meta']);
+    }
 }

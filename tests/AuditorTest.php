@@ -100,4 +100,47 @@ class AuditorTest extends TestCase
         unlink(__DIR__ . '/tmp/' . $fileName);
     }
 
+    public function testSendReturnsFalseAndDoesNotPersistWhenNoDiff()
+    {
+        $auditor = new Audit\Auditor(new Audit\Adapter\File(__DIR__ . '/tmp'));
+        $auditor->setModel('MyApp\Model\User', 1001);
+
+        $filesBefore = scandir(__DIR__ . '/tmp');
+        $result      = $auditor->send(['username' => 'admin'], ['username' => 'admin']);
+        $filesAfter  = scandir(__DIR__ . '/tmp');
+
+        $this->assertFalse($result);
+        $this->assertEquals($filesBefore, $filesAfter);
+    }
+
+    public function testSendWithPreResolvedDiff()
+    {
+        $old = ['username' => 'admin'];
+        $new = ['username' => 'admin2'];
+
+        $auditor = new Audit\Auditor(new Audit\Adapter\File(__DIR__ . '/tmp'));
+        $auditor->setModel('MyApp\Model\User', 1001);
+        $auditor->resolveDiff($old, $new);
+
+        $fileName = $auditor->send();
+
+        $this->assertFileExists(__DIR__ . '/tmp/' . $fileName);
+        unlink(__DIR__ . '/tmp/' . $fileName);
+    }
+
+    public function testSendWithoutStoringFullState()
+    {
+        $old = ['username' => 'admin'];
+        $new = ['username' => 'admin2'];
+
+        $auditor  = new Audit\Auditor(new Audit\Adapter\File(__DIR__ . '/tmp'));
+        $auditor->setModel('MyApp\Model\User', 1001);
+        $fileName = $auditor->send($old, $new, false);
+
+        $data = json_decode(file_get_contents(__DIR__ . '/tmp/' . $fileName), true);
+        $this->assertEmpty($data['state']);
+
+        unlink(__DIR__ . '/tmp/' . $fileName);
+    }
+
 }

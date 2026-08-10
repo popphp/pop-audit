@@ -22,13 +22,6 @@ class FileTest extends TestCase
         $adapter = new Adapter\File(__DIR__ . '/../bad-folder');
     }
 
-    public function testDecode()
-    {
-        $adapter = new Adapter\File(__DIR__ . '/../tmp');
-        $this->assertInstanceOf('Pop\Audit\Adapter\File', $adapter);
-        $this->assertEquals(__DIR__ . '/../tmp', $adapter->getFolder());
-    }
-
     public function testDecodeException()
     {
         $this->expectException('Pop\Audit\Adapter\Exception');
@@ -111,6 +104,28 @@ class FileTest extends TestCase
         $this->expectException('Pop\Audit\Adapter\Exception');
         $adapter  = new Adapter\File(__DIR__ . '/../tmp');
         $adapter->getStateByModel('MyApp\Model\User');
+    }
+
+    public function testGetStateByDateWithExplicitTime()
+    {
+        $old = ['username' => 'admin'];
+        $new = ['username' => 'admin2'];
+
+        $adapter = new Adapter\File(__DIR__ . '/../tmp');
+        $adapter->setModel('MyApp\Model\User')
+            ->setModelId(1001);
+        $adapter->resolveDiff($old, $new);
+        $fileName = $adapter->send();
+
+        $from    = date('Y-m-d H:i:s');
+        $backTo  = date('Y-m-d H:i:s', time() - 10);
+        $results = $adapter->getStateByDate($from, $backTo);
+
+        $this->assertGreaterThanOrEqual(1, count($results));
+
+        if (file_exists(__DIR__ . '/../tmp/' . $fileName)) {
+            unlink(__DIR__ . '/../tmp/' . $fileName);
+        }
     }
 
 }

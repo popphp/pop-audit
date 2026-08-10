@@ -10,20 +10,23 @@ pop-audit
 * [Install](#install)
 * [Quickstart](#quickstart)
   - [Storing Changes](#storing-changes)
+  - [Metadata](#metadata)
   - [Retrieving Changes](#retrieving-changes)
 * [Diffing](#diffing)
 * [Using Files](#using-files)
 * [Using a Database](#using-a-database)
 * [Using HTTP](#using-http)
+* [Auditable Models](#auditable-models)
 
 Overview
 --------
 Pop Audit is an auditing component of the Pop PHP Framework. It allows you to track and recall changes
-in model states, which is useful for rolling back mistakes or recovering lost data. It provides different
-adapters to achieve this, all of which are interchangeable using the same interface:
+in model states, which is useful for building out a system for rolling back mistakes or recovering lost
+data. It provides different adapters to achieve this, all of which are interchangeable using the same
+interface:
 
 - File
-- Database
+- Database (Table)
 - HTTP
 
 `pop-audit` is a component of the [Pop PHP Framework](http://www.popphp.org/).
@@ -89,11 +92,32 @@ $new = [
 $auditor->send($old, $new);
 ```
 
+If `$old` and `$new` don't actually differ, `send()` returns `false` and nothing is stored — a no-op diff
+results in a no-op send, rather than an empty audit record.
+
+[Top](#pop-audit)
+
+### Metadata
+
+Arbitrary key/value context can be attached to a record beyond the built-in user/domain/route/method fields,
+using `setMetadata()` (replaces all metadata) or `addMetadata()` (adds a single key):
+
+```php
+$auditor->setMetadata(['request_id' => 'abc123']);
+$auditor->addMetadata('ip_address', '127.0.0.1');
+```
+
+Metadata is stored alongside the rest of the record and appears under the `metadata` key in the state
+structure shown below.
+
 [Top](#pop-audit)
 
 ### Retrieving Changes
 
-Interacting with the auditor's adapter, the previously stored model states can be retrieved:
+Interacting with the auditor's adapter, the previously stored model states can be retrieved. Every adapter
+implements the same six read methods, but their exact parameters are adapter-specific (e.g. `File`'s
+`getStates()` takes a sort direction/limit/offset, while `Table`'s takes `pop-db` `findBy()`-style
+columns/options) — see each adapter's own section below for its full signatures.
 
 **List all stored states**
 
@@ -112,6 +136,17 @@ Other methods are available to help refine your search for previous states:
 - `getStateById()`
 - `getStateByTimestamp()`
 - `getStateByDate()`
+- `getSnapshot()`
+
+**Get a before/after snapshot for a single record**
+
+This is the method most directly useful for rolling back a change or recovering lost data - it returns just
+the `old` (pre-change) or `new` (post-change) half of a single stored record, by ID:
+
+```php
+$before = $auditor->adapter()->getSnapshot($id);        // the 'old' values
+$after  = $auditor->adapter()->getSnapshot($id, true);   // the 'new' values
+```
 
 The state structure will look like:
 
@@ -154,6 +189,9 @@ Array
 )
 ```
 
+`action` is set automatically based on which of `old`/`new` were empty when the change was recorded: an empty
+`old` means `created`, an empty `new` means `deleted`, and anything else means `updated`.
+
 The storing of the full state is on by default, can be turned off by passing a `false` boolean
 to the `send()` method:
 
@@ -180,7 +218,7 @@ $state = [
     'username' => 'admin2',
     'email'    => 'test@test.com',
     'phone'    => '504-555-5555'
-]
+];
 
 $auditor = new Auditor(new File(__DIR__ . '/tmp'));
 $auditor->setModel('MyApp\Model\User', 1001);
@@ -259,6 +297,19 @@ the model states, as well as a snapshot of the full state (if provided):
 }
 ```
 
+**Retrieving from files**
+
+`File`'s read methods scan the configured folder directly - there's no index, so this adapter is best suited
+to lower-volume/dev use, not a high-traffic production audit trail:
+
+- `getStates(string $sort = 'DESC', ?int $limit = null, ?int $offset = null)`
+- `getStateById(int|string $id)`
+- `getStateByModel(string $model, int|string|null $modelId = null)`
+- `getStateByTimestamp(string $from, ?string $backTo = null)` - despite the `string` type, pass unix
+  timestamps (e.g. `time()`); they're compared directly against each file's modified time
+- `getStateByDate(string $from, ?string $backTo = null)` - `'Y-m-d'` or `'Y-m-d H:i:s'` strings
+- `getSnapshot(int|string $id, bool $post = false)`
+
 [Top](#pop-audit)
 
 Using a Database
@@ -305,6 +356,25 @@ $row = $auditor->send($old, $new);
 
 If needed, the variable `$row` contains the newly created record in the audit table.
 
+If the configured table doesn't exist yet, the `Table` adapter creates it automatically the first time it's
+used - which means the database user needs `CREATE TABLE` privileges. If that's not desirable (e.g. in
+production), reference schema files for MySQL, PostgreSQL, and SQLite are included at
+`vendor/popphp/pop-audit/src/Adapter/Sql/` so you can create the table yourself ahead of time instead (e.g.
+via a migration).
+
+**Retrieving from the database**
+
+`Table`'s read methods proxy to `pop-db`'s `findAll()`/`findBy()`/`findById()`, so `$columns`/`$options`
+follow standard `pop-db` `findBy()` conventions:
+
+- `getStates(?array $columns = null, ?array $options = null)`
+- `getStateById(int|string $id)`
+- `getStateByModel(string $model, int|string|null $modelId = null, array $columns = [])`
+- `getStateByTimestamp(string $from, ?string $backTo = null, array $columns = [])` - despite the `string`
+  type, pass unix timestamps (e.g. `time()`)
+- `getStateByDate(string $from, ?string $backTo = null, array $columns = [])`
+- `getSnapshot(int|string $id, bool $post = false)`
+
 [Top](#pop-audit)
 
 Using HTTP
@@ -330,13 +400,13 @@ $new = [
     'email'    => 'test@test.com'
 ];
 
-$client = new Client(
+$sendClient = new Client(
     'http://audit.localhost',
     Auth::createBearer('AUTH_TOKEN'),
     ['method' => 'POST']
 );
 
-$auditor = new Auditor(new Http($stream));
+$auditor = new Auditor(new Http($sendClient));
 $auditor->setModel('MyApp\Model\User', 1001);
 $auditor->setUser('testuser', 101);
 $auditor->setDomain('users.localhost');
@@ -344,5 +414,67 @@ $response = $auditor->send($old, $new);
 ```
 
 If needed, the variable `$response` contains the HTTP response returned by the HTTP request.
+
+`Http` takes an optional second client, used only for retrieving states, separately from the one used to send
+them - a write-only audit sink doesn't need read credentials/URL configured, and vice versa:
+
+```php
+$fetchClient = new Client(
+    'http://audit.localhost',
+    Auth::createBearer('AUTH_TOKEN'),
+    ['method' => 'GET']
+);
+
+$auditor = new Auditor(new Http($sendClient, $fetchClient));
+```
+
+Calling any of the read methods below without a fetch client configured will fail - only pass a single client
+if you only intend to send audit data through this adapter, never retrieve it.
+
+**Retrieving over HTTP**
+
+- `getStates(array $fields = [])`
+- `getStateById(int|string $id, bool $asQuery = false)`
+- `getStateByModel(string $model, int|string|null $modelId = null)`
+- `getStateByTimestamp(string $from, ?string $backTo = null)` - despite the `string` type, pass unix
+  timestamps (e.g. `time()`)
+- `getStateByDate(string $from, ?string $backTo = null)`
+- `getSnapshot(int|string $id, bool $post = false)`
+
+These build a request in a shape your own audit service needs to understand (e.g. a `filter` array of loose
+string expressions like `'model = MyApp\Model\User'`) - `pop-audit` only defines the client-side contract, not
+a wire protocol, so the receiving service has to implement matching semantics.
+
+[Top](#pop-audit)
+
+Auditable Models
+-----------------
+
+If you'd rather a model hold its own `Auditor` instance directly, rather than calling `Auditor` from elsewhere
+in your application, `Pop\Audit\Model\AuditableModel` (an abstract `Pop\Model\AbstractDataModel` subclass) and
+its `Pop\Audit\Model\AuditableInterface` provide the minimal wiring for that:
+
+```php
+use Pop\Audit\Auditor;
+use Pop\Audit\Adapter\File;
+use Pop\Audit\Model\AuditableModel;
+
+class User extends AuditableModel
+{
+    // ...
+}
+
+$user = new User();
+$user->setAuditor(new Auditor(new File(__DIR__ . '/tmp')));
+
+if ($user->isAuditable()) {
+    $user->getAuditor()->setModel('MyApp\Model\User', 1001);
+    $user->getAuditor()->send($old, $new); // $old/$new as shown under Storing Changes
+}
+```
+
+This is intentionally minimal - it only holds the `Auditor` reference (`setAuditor()`, `getAuditor()`,
+`hasAuditor()`, `isAuditable()`); it does not automatically call the auditor on any model lifecycle event.
+Wiring *when* auditing fires (e.g. from a save/update hook) is left to your application.
 
 [Top](#pop-audit)

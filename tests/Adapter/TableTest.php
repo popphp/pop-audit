@@ -44,7 +44,7 @@ class TableTest extends TestCase
         $states = $adapter->getStates();
         $this->assertGreaterThanOrEqual(0, count($states));
 
-        $states = $adapter->getStates(['timestamp-' => null]);
+        $states = $adapter->getStates(['timestamp' => ['IS NOT NULL']]);
         $this->assertGreaterThanOrEqual(0, count($states));
 
         $stateById = $adapter->getStateById($row->id);
@@ -69,6 +69,79 @@ class TableTest extends TestCase
 
         if (file_exists(__DIR__ . '/../tmp/auditor.sqlite')) {
             unlink( __DIR__ . '/../tmp/auditor.sqlite');
+        }
+    }
+
+    public function testReadMethodsDecodeOldAndNew()
+    {
+        chmod(__DIR__ . '/../tmp', 0777);
+        touch(__DIR__ . '/../tmp/auditor.sqlite');
+        chmod(__DIR__ . '/../tmp/auditor.sqlite', 0777);
+
+        $db = \Pop\Db\Db::sqliteConnect([
+            'database' => __DIR__ . '/../tmp/auditor.sqlite'
+        ]);
+        AuditLog::setDb($db);
+
+        $old = ['username' => 'admin'];
+        $new = ['username' => 'admin2'];
+
+        $adapter = new Adapter\Table('Pop\Audit\Test\Assets\AuditLog');
+        $adapter->setModel('MyApp\Model\User');
+        $adapter->setModelId(1001);
+        $adapter->resolveDiff($old, $new);
+        $adapter->send();
+
+        $states = $adapter->getStates();
+        $state  = reset($states);
+        $this->assertIsArray($state['old']);
+        $this->assertIsArray($state['new']);
+
+        $statesByModel = $adapter->getStateByModel('MyApp\Model\User', 1001);
+        $stateByModel  = reset($statesByModel);
+        $this->assertIsArray($stateByModel['old']);
+        $this->assertIsArray($stateByModel['new']);
+
+        $statesByTs = $adapter->getStateByTimestamp(time() + 10, time() - 10);
+        $stateByTs  = reset($statesByTs);
+        $this->assertIsArray($stateByTs['old']);
+        $this->assertIsArray($stateByTs['new']);
+
+        $statesByDate = $adapter->getStateByDate(date('Y-m-d'), date('Y-m-d'));
+        $stateByDate  = reset($statesByDate);
+        $this->assertIsArray($stateByDate['old']);
+        $this->assertIsArray($stateByDate['new']);
+
+        if (file_exists(__DIR__ . '/../tmp/auditor.sqlite')) {
+            unlink(__DIR__ . '/../tmp/auditor.sqlite');
+        }
+    }
+
+    public function testGetStateByDateWithoutBackTo()
+    {
+        chmod(__DIR__ . '/../tmp', 0777);
+        touch(__DIR__ . '/../tmp/auditor.sqlite');
+        chmod(__DIR__ . '/../tmp/auditor.sqlite', 0777);
+
+        $db = \Pop\Db\Db::sqliteConnect([
+            'database' => __DIR__ . '/../tmp/auditor.sqlite'
+        ]);
+        AuditLog::setDb($db);
+
+        $old = ['username' => 'admin'];
+        $new = ['username' => 'admin2'];
+
+        $adapter = new Adapter\Table('Pop\Audit\Test\Assets\AuditLog');
+        $adapter->setModel('MyApp\Model\User');
+        $adapter->setModelId(1001);
+        $adapter->resolveDiff($old, $new);
+        $adapter->send();
+
+        $states = $adapter->getStateByDate(date('Y-m-d'));
+        $this->assertGreaterThanOrEqual(1, count($states));
+
+        if (file_exists(__DIR__ . '/../tmp/auditor.sqlite')) {
+            unlink(__DIR__ . '/../tmp/auditor.sqlite');
         }
     }
 

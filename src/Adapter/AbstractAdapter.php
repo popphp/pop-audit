@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\Audit\Adapter;
  * @category   Pop
  * @package    Pop\Audit
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    2.0.3
+ * @version    3.0.0
  */
 abstract class AbstractAdapter implements AdapterInterface
 {
@@ -416,6 +416,9 @@ abstract class AbstractAdapter implements AdapterInterface
      */
     public function resolveDiff(array $old = [], array $new = [], bool $state = true): AbstractAdapter
     {
+        $this->original = [];
+        $this->modified = [];
+
         if ($state) {
             $this->setStateData($new);
         }
@@ -426,10 +429,11 @@ abstract class AbstractAdapter implements AdapterInterface
             $this->original = $old;
             $this->action   = AbstractAdapter::DELETED;
         } else {
-            $keys = array_keys(array_diff($old, $new));
-            foreach ($keys as $key) {
-                $this->original[$key] = $old[$key];
-                $this->modified[$key] = $new[$key];
+            foreach ($old as $key => $value) {
+                if (array_key_exists($key, $new) && $new[$key] != $value) {
+                    $this->original[$key] = $value;
+                    $this->modified[$key] = $new[$key];
+                }
             }
             $this->action = AbstractAdapter::UPDATED;
         }

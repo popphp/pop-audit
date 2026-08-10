@@ -25,4 +25,12 @@ class ModelTest extends TestCase
         $this->assertInstanceOf('Pop\Audit\Auditor', $user->getAuditor());
     }
 
+    public function testHasAuditorFalseByDefault()
+    {
+        $user = new User();
+        $this->assertFalse($user->hasAuditor());
+        $this->assertFalse($user->isAuditable());
+        $this->assertNull($user->getAuditor());
+    }
+
 }
