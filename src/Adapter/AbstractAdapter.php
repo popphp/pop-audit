@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -28,7 +29,7 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * Constants for action states
-     * @var int
+     * @var string
      */
     const CREATED = 'created';
     const UPDATED = 'updated';
@@ -510,11 +511,11 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Get model state by timestamp
      *
-     * @param  string  $from
-     * @param  ?string $backTo
+     * @param  int  $from
+     * @param  ?int $backTo
      * @return array
      */
-    abstract public function getStateByTimestamp(string $from, ?string $backTo = null): array;
+    abstract public function getStateByTimestamp(int $from, ?int $backTo = null): array;
 
     /**
      * Get model state by date

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -220,11 +221,11 @@ class File extends AbstractAdapter
     /**
      * Get model state by timestamp
      *
-     * @param  string  $from
-     * @param  ?string $backTo
+     * @param  int  $from
+     * @param  ?int $backTo
      * @return array
      */
-    public function getStateByTimestamp(string $from, ?string $backTo = null): array
+    public function getStateByTimestamp(int $from, ?int $backTo = null): array
     {
         $files   = scandir($this->folder);
         $results = [];

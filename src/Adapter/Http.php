@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -109,8 +110,11 @@ class Http extends AbstractAdapter
     {
         $resultResponse = null;
 
-        if (($this->fetchClient->hasResponse()) && ($this->fetchClient->getResponse()->hasBody())) {
-            $resultResponse = $this->fetchClient->getResponse()->getParsedResponse();
+        if ($this->fetchClient->hasResponse()) {
+            $response = $this->fetchClient->getResponse();
+            if (($response instanceof Client\Response) && ($response->hasBody())) {
+                $resultResponse = $response->getParsedResponse();
+            }
         }
 
         return $resultResponse;
@@ -185,12 +189,12 @@ class Http extends AbstractAdapter
 
         $result = (is_array($parsedResult)) ? $parsedResult : [$parsedResult];
 
-        if (is_array($result) && !empty($result['old']) && is_string($result['old'])) {
+        if (!empty($result['old']) && is_string($result['old'])) {
             if ((json_decode($result['old']) !== false) && (json_last_error() == JSON_ERROR_NONE)) {
                 $result['old'] = json_decode($result['old'], true);
             }
         }
-        if (is_array($result) && !empty($result['new']) && is_string($result['new'])) {
+        if (!empty($result['new']) && is_string($result['new'])) {
             if ((json_decode($result['new']) !== false) && (json_last_error() == JSON_ERROR_NONE)) {
                 $result['new'] = json_decode($result['new'], true);
             }
@@ -231,11 +235,11 @@ class Http extends AbstractAdapter
     /**
      * Get model state by timestamp
      *
-     * @param  string  $from
-     * @param  ?string $backTo
+     * @param  int  $from
+     * @param  ?int $backTo
      * @return array
      */
-    public function getStateByTimestamp(string $from, ?string $backTo = null): array
+    public function getStateByTimestamp(int $from, ?int $backTo = null): array
     {
         $from = date('Y-m-d H:i:s', $from);
 
@@ -315,12 +319,12 @@ class Http extends AbstractAdapter
 
         $result = (is_array($parsedResult)) ? $parsedResult : [$parsedResult];
 
-        if (is_array($result) && !empty($result['old']) && is_string($result['old'])) {
+        if (!empty($result['old']) && is_string($result['old'])) {
             if ((json_decode($result['old']) !== false) && (json_last_error() == JSON_ERROR_NONE)) {
                 $result['old'] = json_decode($result['old'], true);
             }
         }
-        if (is_array($result) && !empty($result['new']) && is_string($result['new'])) {
+        if (!empty($result['new']) && is_string($result['new'])) {
             if ((json_decode($result['new']) !== false) && (json_last_error() == JSON_ERROR_NONE)) {
                 $result['new'] = json_decode($result['new'], true);
             }

@@ -305,8 +305,8 @@ to lower-volume/dev use, not a high-traffic production audit trail:
 - `getStates(string $sort = 'DESC', ?int $limit = null, ?int $offset = null)`
 - `getStateById(int|string $id)`
 - `getStateByModel(string $model, int|string|null $modelId = null)`
-- `getStateByTimestamp(string $from, ?string $backTo = null)` - despite the `string` type, pass unix
-  timestamps (e.g. `time()`); they're compared directly against each file's modified time
+- `getStateByTimestamp(int $from, ?int $backTo = null)` - pass unix timestamps (e.g. `time()`); they're
+  compared directly against each file's modified time
 - `getStateByDate(string $from, ?string $backTo = null)` - `'Y-m-d'` or `'Y-m-d H:i:s'` strings
 - `getSnapshot(int|string $id, bool $post = false)`
 
@@ -370,8 +370,8 @@ follow standard `pop-db` `findBy()` conventions:
 - `getStates(?array $columns = null, ?array $options = null)`
 - `getStateById(int|string $id)`
 - `getStateByModel(string $model, int|string|null $modelId = null, array $columns = [])`
-- `getStateByTimestamp(string $from, ?string $backTo = null, array $columns = [])` - despite the `string`
-  type, pass unix timestamps (e.g. `time()`)
+- `getStateByTimestamp(int $from, ?int $backTo = null, array $columns = [])` - pass unix timestamps
+  (e.g. `time()`)
 - `getStateByDate(string $from, ?string $backTo = null, array $columns = [])`
 - `getSnapshot(int|string $id, bool $post = false)`
 
@@ -436,8 +436,7 @@ if you only intend to send audit data through this adapter, never retrieve it.
 - `getStates(array $fields = [])`
 - `getStateById(int|string $id, bool $asQuery = false)`
 - `getStateByModel(string $model, int|string|null $modelId = null)`
-- `getStateByTimestamp(string $from, ?string $backTo = null)` - despite the `string` type, pass unix
-  timestamps (e.g. `time()`)
+- `getStateByTimestamp(int $from, ?int $backTo = null)` - pass unix timestamps (e.g. `time()`)
 - `getStateByDate(string $from, ?string $backTo = null)`
 - `getSnapshot(int|string $id, bool $post = false)`
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -147,12 +148,12 @@ class Table extends AbstractAdapter
     /**
      * Get model state by timestamp
      *
-     * @param  string  $from
-     * @param  ?string $backTo
-     * @param  array   $columns
+     * @param  int   $from
+     * @param  ?int  $backTo
+     * @param  array $columns
      * @return array
      */
-    public function getStateByTimestamp(string $from, ?string $backTo = null, array $columns = []): array
+    public function getStateByTimestamp(int $from, ?int $backTo = null, array $columns = []): array
     {
         $to = date('Y-m-d H:i:s', $from);
         $columns['timestamp'] = ($backTo !== null) ?

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -204,9 +205,10 @@ interface AdapterInterface
     /**
      * Determine if there is a final state
      *
+     * @param  ?string $name
      * @return bool
      */
-    public function hasStateData(): bool;
+    public function hasStateData(?string $name = null): bool;
 
     /**
      * Set the differences in values between the model states (that have already been processed)
@@ -276,11 +278,11 @@ interface AdapterInterface
     /**
      * Get model state by timestamp
      *
-     * @param  string  $from
-     * @param  ?string $backTo
+     * @param  int  $from
+     * @param  ?int $backTo
      * @return array
      */
-    public function getStateByTimestamp(string $from, ?string $backTo = null): array;
+    public function getStateByTimestamp(int $from, ?int $backTo = null): array;
 
     /**
      * Get model state by date

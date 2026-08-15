@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -14,7 +15,7 @@
 namespace Pop\Audit\Model;
 
 use Pop\Audit\Auditor;
-use Pop\Model\AbstractDataModel;
+use Pop\Db\Model\AbstractDataModel;
 
 /**
  * Abstract auditable model class
