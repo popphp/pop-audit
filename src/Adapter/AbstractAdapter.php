@@ -72,6 +72,12 @@ abstract class AbstractAdapter implements AdapterInterface
     protected array $stateData = [];
 
     /**
+     * Whether the original and modified model states differ
+     * @var bool
+     */
+    protected bool $diffExists = false;
+
+    /**
      * Username
      * @var ?string
      */
@@ -404,6 +410,8 @@ abstract class AbstractAdapter implements AdapterInterface
             $this->action = AbstractAdapter::UPDATED;
         }
 
+        $this->diffExists = ($this->original !== $this->modified);
+
         return $this;
     }
 
@@ -439,6 +447,8 @@ abstract class AbstractAdapter implements AdapterInterface
             $this->action = AbstractAdapter::UPDATED;
         }
 
+        $this->diffExists = ($this->original !== $this->modified);
+
         return $this;
     }
 
@@ -449,7 +459,7 @@ abstract class AbstractAdapter implements AdapterInterface
      */
     public function hasDiff(): bool
     {
-        return (($this->action !== null) && ($this->original !== $this->modified));
+        return (($this->action !== null) && $this->diffExists);
     }
 
     /**

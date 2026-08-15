@@ -45,8 +45,9 @@ class Table extends AbstractAdapter
     public function __construct(string $table)
     {
         $this->setTable($table);
-        $db        = call_user_func($this->table . '::getDb');
-        $tableName = call_user_func($this->table . '::table');
+        $tableClass = $this->table;
+        $db         = $tableClass::getDb();
+        $tableName  = $tableClass::table();
 
         if (!($db->hasTable($tableName))) {
             $this->createTable($tableName);
@@ -106,11 +107,8 @@ class Table extends AbstractAdapter
      */
     public function getStates(?array $columns = null, ?array $options = null): array
     {
-        if ($columns !== null) {
-            $result = call_user_func_array($this->table . '::findBy', ['columns' => $columns, 'options' => $options]);
-        } else {
-            $result = call_user_func_array($this->table . '::findAll', ['options' => $options]);
-        }
+        $tableClass = $this->table;
+        $result     = ($columns !== null) ? $tableClass::findBy($columns, $options) : $tableClass::findAll($options);
 
         return array_map([$this, 'decodeState'], $result->toArray());
     }
@@ -123,7 +121,8 @@ class Table extends AbstractAdapter
      */
     public function getStateById(int|string $id): array
     {
-        $record = call_user_func_array($this->table . '::findById', ['id' => $id]);
+        $tableClass = $this->table;
+        $record     = $tableClass::findById($id);
         return $this->decodeState($record->toArray());
     }
 
@@ -141,7 +140,8 @@ class Table extends AbstractAdapter
         if ($modelId !== null) {
             $columns['model_id'] = $modelId;
         }
-        $result = call_user_func_array($this->table . '::findBy', [$columns]);
+        $tableClass = $this->table;
+        $result     = $tableClass::findBy($columns);
         return array_map([$this, 'decodeState'], $result->toArray());
     }
 
@@ -159,7 +159,8 @@ class Table extends AbstractAdapter
         $columns['timestamp'] = ($backTo !== null) ?
             ['BETWEEN', date('Y-m-d H:i:s', $backTo), $to] : ['<=', $to];
 
-        $result = call_user_func_array($this->table . '::findBy', [$columns]);
+        $tableClass = $this->table;
+        $result     = $tableClass::findBy($columns);
         return array_map([$this, 'decodeState'], $result->toArray());
     }
 
@@ -184,7 +185,8 @@ class Table extends AbstractAdapter
         } else {
             $columns['timestamp'] = ['<=', $from];
         }
-        $result = call_user_func_array($this->table . '::findBy', [$columns]);
+        $tableClass = $this->table;
+        $result     = $tableClass::findBy($columns);
         return array_map([$this, 'decodeState'], $result->toArray());
     }
 
@@ -215,13 +217,14 @@ class Table extends AbstractAdapter
      */
     public function getSnapshot(int|string $id, bool $post = false): array
     {
-        $result   = call_user_func_array($this->table . '::findById', ['id' => $id]);
-        $snapshot = [];
+        $tableClass = $this->table;
+        $result     = $this->decodeState($tableClass::findById($id)->toArray());
+        $snapshot   = [];
 
-        if (!($post) && !empty($result->old)) {
-            $snapshot = json_decode($result->old, true);
-        } else if (($post) && !empty($result->new)) {
-            $snapshot = json_decode($result->new, true);
+        if (!($post) && !empty($result['old'])) {
+            $snapshot = $result['old'];
+        } else if (($post) && !empty($result['new'])) {
+            $snapshot = $result['new'];
         }
 
         return $snapshot;
@@ -235,8 +238,9 @@ class Table extends AbstractAdapter
      */
     protected function createTable(string $tableName): void
     {
-        $db     = call_user_func($this->table . '::getDb');
-        $schema = $db->createSchema();
+        $tableClass = $this->table;
+        $db         = $tableClass::getDb();
+        $schema     = $db->createSchema();
         $schema->create($tableName)
             ->int('id')->increment()
             ->int('user_id')

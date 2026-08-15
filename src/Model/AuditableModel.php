@@ -75,7 +75,7 @@ abstract class AuditableModel extends AbstractDataModel implements AuditableInte
      */
     public function isAuditable(): bool
     {
-        return ($this->auditor !== null);
+        return $this->hasAuditor();
     }
 
 }

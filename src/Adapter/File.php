@@ -92,6 +92,43 @@ class File extends AbstractAdapter
     }
 
     /**
+     * Get the timestamp embedded in the filename, written by send()
+     *
+     * @param  string $filename
+     * @return int
+     */
+    protected function getFileTimestamp(string $filename): int
+    {
+        $name = substr($filename, 0, strrpos($filename, '.'));
+        return (int)substr($name, strrpos($name, '-') + 1);
+    }
+
+    /**
+     * Get model states filtered by a timestamp range
+     *
+     * @param  int  $from
+     * @param  ?int $backTo
+     * @return array
+     */
+    protected function filterStatesByTimestamp(int $from, ?int $backTo = null): array
+    {
+        $files   = scandir($this->folder);
+        $results = [];
+
+        foreach ($files as $file) {
+            if (($file != '.') && ($file != '..')) {
+                $mtime = $this->getFileTimestamp($file);
+                if ((($backTo !== null) && ($mtime <= $from) && ($mtime >= $backTo)) ||
+                    (($backTo === null) && ($mtime <= $from))) {
+                    $results[$file] = $this->decode($file);
+                }
+            }
+        }
+
+        return $results;
+    }
+
+    /**
      * Decode the audit file
      *
      * @param  string $filename
@@ -148,8 +185,7 @@ class File extends AbstractAdapter
 
         foreach ($files as $file) {
             if (($file != '.') && ($file != '..')) {
-                $mtime = filemtime($this->folder . DIRECTORY_SEPARATOR . $file);
-                $fileNames[$mtime] = $file;
+                $fileNames[$this->getFileTimestamp($file)] = $file;
             }
         }
 
@@ -227,20 +263,7 @@ class File extends AbstractAdapter
      */
     public function getStateByTimestamp(int $from, ?int $backTo = null): array
     {
-        $files   = scandir($this->folder);
-        $results = [];
-
-        foreach ($files as $file) {
-            if (($file != '.') && ($file != '..')) {
-                $mtime = filemtime($this->folder . DIRECTORY_SEPARATOR . $file);
-                if ((($backTo !== null) && ($mtime <= $from) && ($mtime >= $backTo)) ||
-                    (($backTo === null) && ($mtime <= $from))) {
-                    $results[$file] = $this->decode($file);
-                }
-            }
-        }
-
-        return $results;
+        return $this->filterStatesByTimestamp($from, $backTo);
     }
 
     /**
@@ -252,8 +275,6 @@ class File extends AbstractAdapter
      */
     public function getStateByDate(string $from, ?string $backTo = null): array
     {
-        $results = [];
-
         if (!str_contains($from, ' ')) {
             $from .= ' 23:59:59';
         }
@@ -267,18 +288,7 @@ class File extends AbstractAdapter
             $backTo = strtotime($backTo);
         }
 
-        $files = scandir($this->folder);
-        foreach ($files as $file) {
-            if (($file != '.') && ($file != '..')) {
-                $mtime = filemtime($this->folder . DIRECTORY_SEPARATOR . $file);
-                if ((($backTo !== null) && ($mtime <= $from) && ($mtime >= $backTo)) ||
-                    (($backTo === null) && ($mtime <= $from))) {
-                    $results[$file] = $this->decode($file);
-                }
-            }
-        }
-
-        return $results;
+        return $this->filterStatesByTimestamp($from, $backTo);
     }
 
     /**

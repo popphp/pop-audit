@@ -121,6 +121,51 @@ class Http extends AbstractAdapter
     }
 
     /**
+     * Decode the JSON-encoded old/new state fields of a result row
+     *
+     * @param  array $result
+     * @return array
+     */
+    protected function decodeState(array $result): array
+    {
+        foreach (['old', 'new'] as $field) {
+            if (!empty($result[$field]) && is_string($result[$field])) {
+                $decoded = json_decode($result[$field], true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $result[$field] = $decoded;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Send the fetch request and return the fetched result as an array
+     *
+     * @return array
+     */
+    protected function fetchResults(): array
+    {
+        $this->fetchClient->send();
+        $results = $this->getFetchedResult();
+
+        return (is_array($results)) ? $results : [];
+    }
+
+    /**
+     * Send the fetch request with a filter payload and return the fetched result as an array
+     *
+     * @param  array $filter
+     * @return array
+     */
+    protected function fetchByFilter(array $filter): array
+    {
+        $this->fetchClient->setData(['filter' => $filter]);
+        return $this->fetchResults();
+    }
+
+    /**
      * Determine if the adapter has a fetch stream
      *
      * @return bool
@@ -160,11 +205,8 @@ class Http extends AbstractAdapter
         if (!empty($fields)) {
             $this->fetchClient->setData($fields);
         }
-        $this->fetchClient->send();
 
-        $results = $this->getFetchedResult();
-
-        return (is_array($results)) ? $results : [];
+        return $this->fetchResults();
     }
 
     /**
@@ -188,17 +230,7 @@ class Http extends AbstractAdapter
         $parsedResult = $this->getFetchedResult();
 
         $result = (is_array($parsedResult)) ? $parsedResult : [$parsedResult];
-
-        if (!empty($result['old']) && is_string($result['old'])) {
-            if ((json_decode($result['old']) !== false) && (json_last_error() == JSON_ERROR_NONE)) {
-                $result['old'] = json_decode($result['old'], true);
-            }
-        }
-        if (!empty($result['new']) && is_string($result['new'])) {
-            if ((json_decode($result['new']) !== false) && (json_last_error() == JSON_ERROR_NONE)) {
-                $result['new'] = json_decode($result['new'], true);
-            }
-        }
+        $result = $this->decodeState($result);
 
         $this->fetchClient->getRequest()->getUri()->setUri($origUrl);
 
@@ -214,22 +246,13 @@ class Http extends AbstractAdapter
      */
     public function getStateByModel(string $model, int|string|null $modelId = null): array
     {
-        $fields = [
-            'filter' => [
-                'model = ' . $model
-            ]
-        ];
+        $filter = ['model = ' . $model];
 
         if ($modelId !== null) {
-            $fields['filter'][] = 'model_id = ' . $modelId;
+            $filter[] = 'model_id = ' . $modelId;
         }
 
-        $this->fetchClient->setData($fields);
-        $this->fetchClient->send();
-
-        $results = $this->getFetchedResult();
-
-        return (is_array($results)) ? $results : [];
+        return $this->fetchByFilter($filter);
     }
 
     /**
@@ -241,28 +264,13 @@ class Http extends AbstractAdapter
      */
     public function getStateByTimestamp(int $from, ?int $backTo = null): array
     {
-        $from = date('Y-m-d H:i:s', $from);
+        $filter = ['timestamp <= ' . date('Y-m-d H:i:s', $from)];
 
         if ($backTo !== null) {
-            $backTo = date('Y-m-d H:i:s', $backTo);
+            $filter[] = 'timestamp >= ' . date('Y-m-d H:i:s', $backTo);
         }
 
-        $fields = [
-            'filter' => [
-                'timestamp <= ' . $from
-            ]
-        ];
-
-        if ($backTo !== null) {
-            $fields['filter'][] = 'timestamp >= ' . $backTo;
-        }
-
-        $this->fetchClient->setData($fields);
-        $this->fetchClient->send();
-
-        $results = $this->getFetchedResult();
-
-        return (is_array($results)) ? $results : [];
+        return $this->fetchByFilter($filter);
     }
 
     /**
@@ -278,28 +286,16 @@ class Http extends AbstractAdapter
             $from .= ' 23:59:59';
         }
 
+        $filter = ['timestamp <= ' . $from];
+
         if ($backTo !== null) {
             if (!str_contains($backTo, ' ')) {
                 $backTo .= ' 00:00:00';
             }
+            $filter[] = 'timestamp >= ' . $backTo;
         }
 
-        $fields = [
-            'filter' => [
-                'timestamp <= ' . $from
-            ]
-        ];
-
-        if ($backTo !== null) {
-            $fields['filter'][] = 'timestamp >= ' . $backTo;
-        }
-
-        $this->fetchClient->setData($fields);
-        $this->fetchClient->send();
-
-        $results = $this->getFetchedResult();
-
-        return (is_array($results)) ? $results : [];
+        return $this->fetchByFilter($filter);
     }
 
     /**
@@ -318,17 +314,7 @@ class Http extends AbstractAdapter
         $parsedResult = $this->getFetchedResult();
 
         $result = (is_array($parsedResult)) ? $parsedResult : [$parsedResult];
-
-        if (!empty($result['old']) && is_string($result['old'])) {
-            if ((json_decode($result['old']) !== false) && (json_last_error() == JSON_ERROR_NONE)) {
-                $result['old'] = json_decode($result['old'], true);
-            }
-        }
-        if (!empty($result['new']) && is_string($result['new'])) {
-            if ((json_decode($result['new']) !== false) && (json_last_error() == JSON_ERROR_NONE)) {
-                $result['new'] = json_decode($result['new'], true);
-            }
-        }
+        $result = $this->decodeState($result);
 
         $snapshot = [];
 
