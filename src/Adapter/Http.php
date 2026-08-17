@@ -112,7 +112,7 @@ class Http extends AbstractAdapter
 
         if ($this->fetchClient->hasResponse()) {
             $response = $this->fetchClient->getResponse();
-            if (($response instanceof Client\Response) && ($response->hasBody())) {
+            if ($response->hasBody()) {
                 $resultResponse = $response->getParsedResponse();
             }
         }
