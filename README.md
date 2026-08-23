@@ -2,7 +2,7 @@ pop-audit
 =========
 
 [![Build Status](https://github.com/popphp/pop-audit/workflows/phpunit/badge.svg)](https://github.com/popphp/pop-audit/actions)
-[![Coverage Status](http://cc.popphp.org/coverage.php?comp=pop-audit)](http://cc.popphp.org/pop-audit/)
+[![Coverage Status](https://cc.popphp.org/coverage.php?comp=pop-audit)](https://cc.popphp.org/pop-audit/)
 
 [![Join the chat at https://discord.gg/TZjgT74U7E](https://media.popphp.org/img/discord.svg)](https://discord.gg/TZjgT74U7E)
 
@@ -29,7 +29,7 @@ interface:
 - Database (Table)
 - HTTP
 
-`pop-audit` is a component of the [Pop PHP Framework](http://www.popphp.org/).
+`pop-audit` is a component of the [Pop PHP Framework](https://www.popphp.org/).
 
 [Top](#pop-audit)
 
