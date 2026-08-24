@@ -179,28 +179,26 @@ class File extends AbstractAdapter
      */
     public function getStates(string $sort = 'DESC', ?int $limit = null, ?int $offset = null): array
     {
-        $files     = scandir($this->folder);
-        $fileNames = [];
-        $results   = [];
+        $files    = scandir($this->folder);
+        $fileList = [];
+        $results  = [];
 
         foreach ($files as $file) {
             if (($file != '.') && ($file != '..')) {
-                $fileNames[$this->getFileTimestamp($file)] = $file;
+                $fileList[] = ['name' => $file, 'timestamp' => $this->getFileTimestamp($file)];
             }
         }
 
-        if ($sort == 'ASC') {
-            ksort($fileNames, SORT_NUMERIC);
-        } else {
-            krsort($fileNames, SORT_NUMERIC);
-        }
+        usort($fileList, function ($a, $b) use ($sort) {
+            return ($sort == 'ASC') ? ($a['timestamp'] <=> $b['timestamp']) : ($b['timestamp'] <=> $a['timestamp']);
+        });
 
         if ($limit !== null) {
-            $fileNames = array_slice($fileNames, (int)$offset, (int)$limit);
+            $fileList = array_slice($fileList, (int)$offset, (int)$limit);
         }
 
-        foreach ($fileNames as $fileName) {
-            $results[$fileName] = $this->decode($fileName);
+        foreach ($fileList as $file) {
+            $results[$file['name']] = $this->decode($file['name']);
         }
 
         return $results;

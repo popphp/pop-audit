@@ -106,6 +106,33 @@ class FileTest extends TestCase
         $adapter->getStateByModel('MyApp\Model\User');
     }
 
+    public function testGetStatesDoesNotDropSameSecondRecords()
+    {
+        $folder    = __DIR__ . '/../tmp';
+        $adapter   = new Adapter\File($folder);
+        $timestamp = time();
+        $id        = md5('CollisionTest-9001');
+        $fileName1 = 'pop-audit-' . $id . '-' . uniqid('a') . '-' . $timestamp . '.log';
+        $fileName2 = 'pop-audit-' . $id . '-' . uniqid('b') . '-' . $timestamp . '.log';
+
+        file_put_contents(
+            $folder . '/' . $fileName1,
+            json_encode(['old' => ['username' => 'admin'], 'new' => ['username' => 'admin1']])
+        );
+        file_put_contents(
+            $folder . '/' . $fileName2,
+            json_encode(['old' => ['username' => 'admin'], 'new' => ['username' => 'admin2']])
+        );
+
+        $states = $adapter->getStates();
+
+        $this->assertArrayHasKey($fileName1, $states);
+        $this->assertArrayHasKey($fileName2, $states);
+
+        unlink($folder . '/' . $fileName1);
+        unlink($folder . '/' . $fileName2);
+    }
+
     public function testGetStateByDateWithExplicitTime()
     {
         $old = ['username' => 'admin'];
